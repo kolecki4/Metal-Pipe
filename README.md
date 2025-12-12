@@ -1,6 +1,5 @@
-# MOOG++ (moogplusplus)
-
-Named for its expansion on the functionality of MOOG, as well as the primary language in which it was written, `moogplusplus` is designed to be a highly accurate line-by-line stellar spectrum fitting code fit for use with as many wavelength ranges and stellar spectral types as possible.
+# Metal Pipe
+Metal Pipe is designed to be a highly accurate line-by-line stellar spectrum fitting code fit for use with as many wavelength ranges and stellar spectral types as possible.
 
 Future work will focus on adding more line lists, especially for the near-infrared wavelength range, as support is extended to late-K and M type stars.
 
@@ -20,10 +19,10 @@ This is the C++ library on which the core line-fitting algorithm is based. On my
 On the other hand, if your favorite package manager does not have a GSL package ready, or you do not have write access to `/usr/include`, you will need to compile this package from source. Doing so in most cases should install GSL in the default (correct) location
 
 
-### 2. Determine how many cores/threads your system has, and how many you want MOOG++ to have access to
+### 2. Determine how many cores/threads your system has, and how many you want Metal Pipe to have access to
 If you don't know how many threads your CPU has, you can look up the CPU model name online and find the information. Alternatively, try runnning `lscpu | grep "Model name\|CPU(s):\|Thread(s)\|Core(s)\|Socket(s)"` from the command line. This will give you a number of threads, listed as "CPU(s)" and tell you your CPU model name. 
 
-Once you're aware of how many threads you'll be able to utilize, set the maximum number available to MOOG++ by opening `RunAbundanceOnGoodLines.cpp` in a text editor and change the value of `MAX_THREADS` (on line 18) to be your desired value
+Once you're aware of how many threads you'll be able to utilize, set the maximum number available to Metal Pipe by opening `RunAbundanceOnGoodLines.cpp` in a text editor and change the value of `MAX_THREADS` (on line 18) to be your desired value
 
 ### 3. Run INSTALL.sh
 - If you installed GSL using apt, you can run INSTALL.sh as is.
@@ -37,7 +36,7 @@ Once you're aware of how many threads you'll be able to utilize, set the maximum
 
 
 
-## Running MOOG++
+## Running Metal Pipe
 
 ### 1. Prepare the Stellar Spectrum
 The observed stellar spectrum file **absolutely must:**
@@ -49,20 +48,20 @@ The observed stellar spectrum file **absolutely must:**
 
 As of now, if you name the spectrum file with the string "flattened" in it, the python script will automatically pick it up and add it to the parameters file.
 
-**It is highly recommended** that you create a unique folder for each stellar spectrum, as MOOG++ will dump output files to the same directory the spectrum is in.
+**It is highly recommended** that you create a unique folder for each stellar spectrum, as Metal Pipe will dump output files to the same directory the spectrum is in.
 
 ### 2. Choose Line Lists
-In its default configuration, MOOG++ is built to fit lines of Fe, Ca, Ti, Mg, Si, C, O, Na, Al, and K, in that order, with a range of wavelengths chosen to coincide with KPF. These line lists are stored in the appropriately named `linelists` folder. This folder contains an additional file, `defaults.txt` which tells MOOG++ what files should be used to fit which elemental abundances.
+In its default configuration, Metal Pipe is built to fit lines of Fe, Ca, Ti, Mg, Si, C, O, Na, Al, and K, in that order, with a range of wavelengths chosen to coincide with KPF. These line lists are stored in the appropriately named `linelists` folder. This folder contains an additional file, `defaults.txt` which tells Metal Pipe what files should be used to fit which elemental abundances.
 
 If this all sounds good to you (you're interested in fitting the stated elements using KPF spectra), great! You can stop reading the rest of this section and go to the next step.
 
 ...
 
-Otherwise, you'll have to pick what lines you want to fit. I have some helper scripts for this which will be available on written request (they're ugly and not ready to be public just yet, but they work). You're also welcome to simply pick out your favorite lines, though the wavelength data must match the wavelength data provided in linemake's repository of lines, otherwise you risk MOOG++ just not finding your lines. I recommend combing through linemake's `mooglists` directory and choosing the lines from there. This way, you can make sure that a) linemake actually has data for the lines you want, and b) the wavelengths you're telling MOOG++ the lines are located at are actually correct.
+Otherwise, you'll have to pick what lines you want to fit. I have some helper scripts for this which will be available on written request (they're ugly and not ready to be public just yet, but they work). You're also welcome to simply pick out your favorite lines, though the wavelength data must match the wavelength data provided in linemake's repository of lines, otherwise you risk Metal Pipe just not finding your lines. I recommend combing through linemake's `mooglists` directory and choosing the lines from there. This way, you can make sure that a) linemake actually has data for the lines you want, and b) the wavelengths you're telling Metal Pipe the lines are located at are actually correct.
 
 
 ### 3. Run `./runStar.sh`
-First, open up a terminal in the MOOG++ directory
+First, open up a terminal in the Metal Pipe directory
 
 The bash script requires a few command line arguments to kick everything off, but will carry the code from there to its completion. In order, they are as follows:
 
@@ -76,9 +75,9 @@ Here is an example of what those command line arguments look like:
 
 
 ## Understanding the Output
-MOOG++ creates a directory for each element, named after its atomic number. In these folders, a text file is created for each line which was successfully fit. 
+Metal Pipe creates a directory for each element, named after its atomic number. In these folders, a text file is created for each line which was successfully fit. 
 
-Generally, however, you will be most interested in the "params.txt" file. This file is used as both an input and an output file, and contains all the information you're likely to want out of MOOG++ at a glance:
+Generally, however, you will be most interested in the "params.txt" file. This file is used as both an input and an output file, and contains all the information you're likely to want out of Metal Pipe at a glance:
 
 - Stellar parameters:
   - $T_{\textrm{eff}}$, $\log{g}$, $[M/H]$, $[\alpha/M]$, $M/M_\odot$, $R/R_\odot$, and $L/L_\odot$. Each is listed with their values and 1-sigma uncertainties.
