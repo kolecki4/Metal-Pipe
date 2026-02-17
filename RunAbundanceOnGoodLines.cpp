@@ -190,7 +190,7 @@ int abundanceRunOnFile(std::string paramFile, std::vector<double> &abundances, s
             std::cout << "[M/H] = " << atmosphereInfo.MonH << "\n"; 
 
             std::cout << "[X/Fe] = " << medAbundance - atmosphereInfo.MonH << " +/- " << stdev << "\n"; 
-            if(atmosphereInfo.elementString[j] == "26"  && abs(atmosphereInfo.MonH - medAbundance) > std::max(stdev, 0.01)){
+            if(atmosphereInfo.elementString[j] == "26"  && abs(atmosphereInfo.MonH - medAbundance) > std::max(stdev, 0.024)){
                 return 1;
             }
 
@@ -206,7 +206,7 @@ int abundanceRunOnFile(std::string paramFile, std::vector<double> &abundances, s
                 if(nAlphaElementsFit ==2){
                     stdevAlpha = pow(stdevAlpha,0.5);
                     std::cout << "ALPHA ABUNDANCE NONCONVERGENCE?: " << atmosphereInfo.AonM << " - " << alpha << " > " << stdevAlpha << "\n";
-                    if(abs(atmosphereInfo.AonM - alpha) > std::max(stdevAlpha, 0.01) ){
+                    if(abs(atmosphereInfo.AonM - alpha) > std::max(stdevAlpha, 0.024) ){
                         return 1;
                     }
                 }

@@ -16,7 +16,7 @@ std::vector<double> readMOOGlistWavelengths(std::string fileName, std::string el
 
 
     while(!inFile.eof()){
-        getline(inFile, inLine);
+        std::getline(inFile, inLine);
         if(inLine.find(" " + elementStr + " ") != std::string::npos){
             waveToAdd = std::stod(inLine.substr(0,12));
             
@@ -38,6 +38,7 @@ std::vector<double> readListOfWavelengths(std::string fileName){
     std::vector<double> wavelengths;
     std::ifstream inFile;
     std::string inLine;
+    double wavelength;
 
     inFile.open(fileName);
     if(inFile.fail()){
@@ -46,8 +47,11 @@ std::vector<double> readListOfWavelengths(std::string fileName){
 
 
     while(!inFile.eof()){
-        getline(inFile, inLine);
-        if(inLine.length() > 0){wavelengths.push_back(std::stod(inLine));}
+        std::getline(inFile, inLine);
+        if(inLine.length() > 0){
+            wavelength = std::stod(inLine);
+            //std::cout << inLine << " ";
+            wavelengths.push_back(wavelength);}
     }
 
     return wavelengths;

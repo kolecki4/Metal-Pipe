@@ -14,7 +14,7 @@ double functionToMinimize(const gsl_vector *v, void *p){
     double newOffset = gsl_vector_get(v,0);
     double newVBroad = gsl_vector_get(v,1);
 
-    if(newVBroad < 0 || newVBroad > 15 || newOffset > 1 || newOffset < -1){
+    if(newVBroad < 0 || newVBroad > lineToFit->lineInfo.maxAllowedVBroad || newOffset > 1 || newOffset < -1){
         return 999999;
     }
 

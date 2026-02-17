@@ -10,3 +10,4 @@
 11  linelists/Na.txt
 13  linelists/Al.txt
 19  linelists/K.txt
+63  linelists/Eu.txt

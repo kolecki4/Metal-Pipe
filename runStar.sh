@@ -1,6 +1,17 @@
 #! /bin/bash
 ARGC=$#
-
+#echo " ╔═════════════════════════════════════════════════════════════════════════════╗"
+#echo " ║     *__________* ___    __  * ______    ______  * ______  *  _      _     * ║"
+#echo " ║     ___________ │   ╲  ╱  ╲  ╱  __  ╲ *╱  __  ╲  ╱  ____╲  _│ │_ *_│ │_     ║"
+#echo " ║    ____________ │  \ ╲╱    ││  ╱  ╲  ││  ╱  ╲  ││  ╱  ___ │_\`  _││_\`  _│    ║"
+#echo " ║ * _____________ │  │╲  ╱│  ││ │    │ ││ │    │ ││ │  │_  │  │_│    │_│      ║"
+#echo " ║  ______________ │  │ ╲╱ │  ││  ╲__╱  ││  ╲__╱  ││  ╲__╱  │    *     *       ║"
+#echo " ║ _______________ │__│ *  │__│ ╲______╱* ╲______╱  ╲______╱ *            *    ║"
+#echo " ║   *        *                 *                  *               *           ║"
+#echo " ╟─────────────────────────────────────────────────────────────────────────────╢"
+#echo " ║ ░░░░░░░▒▒▒▒▒▒▒▓▓▓▓▓▓▓████████ Beta Version 1.1 ███████▓▓▓▓▓▓▓▒▒▒▒▒▒▒░░░░░░░ ║"
+#echo " ╚═════════════════════════════════════════════════════════════════════════════╝"
+#
 echo "╔══════════════════════════════════════════════════════════════════════════════╗"
 echo "║                                                                              ║"
 echo "║                                               ,,,,,,,,;;;;''\                ║"
@@ -13,6 +24,14 @@ echo "║                                                                       
 echo "╟──────────────────────────────────────────────────────────────────────────────╢"
 echo "║ ░░░░░░░▒▒▒▒▒▒▒▓▓▓▓▓▓▓███████ Beta Version 1.5.1 ███████▓▓▓▓▓▓▓▒▒▒▒▒▒▒░░░░░░░ ║"
 echo "╚══════════════════════════════════════════════════════════════════════════════╝"
+
+n=$(($RANDOM % 100))
+echo $n
+if [ $n -lt 10 ];
+then
+    ffplay -autoexit -nodisp "Destruction_Metal_Pole_L_Wave_2_0_0.wav" &>/dev/null &
+
+fi;
 
 if [ $ARGC -ne 3 ];
 then
@@ -44,8 +63,8 @@ else
     do
         
 
-        #valgrind -s --leak-check=full --show-leak-kinds=all --verbose --track-origins=yes --log-file=valgrind-out.txt 
-        ./RunAbundanceOnGoodLines ${workDir}params.txt 
+        #valgrind [ARG] -s --leak-check=full --show-leak-kinds=all --verbose --track-origins=yes --log-file=valgrind-out.txt 
+        ./RunAbundanceOnGoodLines ${workDir}params.txt
         notConverged=$?
         python computeParamFile.py "${starName}" ${workDir} params.txt ${initMetal} 0.0 ${i}
         problem=$?
@@ -57,6 +76,8 @@ else
     done
     python correctForNLTE.py ${workDir} O
     python correctForNLTE.py ${workDir} S
-    python correctForNLTE.py ${workDir} K
+    #/scr/jkolecki/miniconda3/bin/python3 correctForNLTE.py ${workDir} K
+    python correctForNLTE.py ${workDir} Ca
+    python correctForNLTE.py ${workDir} Ti
     python plotSomeLines.py ${workDir}
 fi;

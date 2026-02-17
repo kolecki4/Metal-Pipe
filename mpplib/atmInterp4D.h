@@ -60,7 +60,7 @@ std::vector<std::vector<double>> readAtmoFile(double Teff, double logg, double M
     inFile.open(buildAtmoFileName(Teff,logg,M_H, alpha));
     if(!inFile.fail()){
         while(!inFile.eof()){
-            getline(inFile, fLine, '\n');
+            std::getline(inFile, fLine, '\n');
             while(fLine.size() > 0){
                 buffer.push_back(std::stof(fLine.substr(0, 13)));
                 if (fLine.size() > 12){fLine = fLine.substr(13, fLine.size()-13);}

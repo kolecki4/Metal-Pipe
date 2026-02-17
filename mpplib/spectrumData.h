@@ -2,6 +2,8 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <iomanip>
+
 class spectrumData{
 
     public:
@@ -43,6 +45,7 @@ spectrumData::spectrumData(std::string fileName, std::string fileType){
 
     std::ifstream inFile;
     std::string inLine;
+    double value = 0;
 
     inFile.open(fileName);
     if(inFile.fail()){
@@ -55,19 +58,27 @@ spectrumData::spectrumData(std::string fileName, std::string fileType){
         int i = 0;
         while(!inFile.eof()){
             if (i % 3 == 0){
-                getline(inFile, inLine, ' ');
-                if (inLine.length() > 0){wavelength.push_back(stod(inLine));}
+                std::getline(inFile, inLine, ' ');
+                //std::cout << "inLine = " << inLine << "\n";
+                if (inLine.length() > 0){
+                    value = std::stod(inLine);
+                    //std::cout << "value  = " << value << "\n";
+                    wavelength.push_back(value);}
             }
 
             else if (i % 3 == 1){
-                getline(inFile, inLine, ' ');
-                if (inLine.length() > 0){observedFlux.push_back(stod(inLine));}
+                std::getline(inFile, inLine, ' ');
+                if (inLine.length() > 0){
+                    value = std::stod(inLine);
+                    observedFlux.push_back(value);
+                }
             }
 
             else{
-                getline(inFile, inLine, '\n');
+                std::getline(inFile, inLine, '\n');
                 if (inLine.length() > 0){
-                    observedUncertainty.push_back(stod(inLine));
+                    value = std::stod(inLine);
+                    observedUncertainty.push_back(value);
                     synthedFlux.push_back(0);
                     chi2Weights.push_back(1);
                     length++;
@@ -80,21 +91,23 @@ spectrumData::spectrumData(std::string fileName, std::string fileType){
 
     if(fileType == "syn"){
 
-        getline(inFile, inLine, '\n');
-        getline(inFile, inLine, '\n');
+        std::getline(inFile, inLine, '\n');
+        std::getline(inFile, inLine, '\n');
 
         wavelengthGrid = fileType;
         int i = 0;
         while(!inFile.eof()){
-            getline(inFile, inLine, ' ');
+            std::getline(inFile, inLine, ' ');
             if(inLine.length() > 0){
 
                 if (i % 2 == 0){
-                    wavelength.push_back(stod(inLine));
+                    value = std::stod(inLine);
+                    wavelength.push_back(value);
 
                 }
                 else{
-                    synthedFlux.push_back(stod(inLine));
+                    value = std::stod(inLine);                    
+                    synthedFlux.push_back(value);
                     observedUncertainty.push_back(0);
                     observedFlux.push_back(0);
                     chi2Weights.push_back(1);
@@ -203,12 +216,14 @@ void spectrumData::writeToTextFile(std::string fileName){
     std::ofstream outFile;
     std::string outLine;
     std::vector<double> outValues;
-    outFile.open(fileName);
-
+    outFile.open(fileName); 
+    outFile << std::setprecision(10);
     outFile << "wav, obs, sigma_obs, syn, weight\n";
     for(int i = 0; i < length; i++){
         outValues = getRow(i);
+
         for(size_t j = 0; j < outValues.size(); j++){
+            
             outFile << outValues[j];
             if(size_t(j) == outValues.size()-1){
                 outFile << "\n";

@@ -11,7 +11,7 @@ std::string getDefaultLinelistName(int element){
         throw std::runtime_error("Default line lists file not found!");
     }
     while(!inFile.eof()){
-        getline(inFile, inLine);
+        std::getline(inFile, inLine);
         if (std::stoi(inLine.substr(0,2)) == element){
             fileName = inLine.substr(4);
             inFile.close();

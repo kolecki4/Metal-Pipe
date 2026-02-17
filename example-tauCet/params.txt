@@ -1,20 +1,20 @@
-   tau Cet
+  tau Ceti
 ******************************
    WorkDir example-tauCet/
   SpecFile 10700_flattened_20230908.txt
 ******************************
-   FitAtom        26,20,22,12,14,6,7,8,16,11,13,19
+   FitAtom        26,20,22,12,14,6,7,8,16,11,13,19,63
 ******************************
-     T_eff      5519        75
+     T_eff      5545        78
     log(g)      4.59      0.03
    v_micro      1.50      0.00
- v_broad_0      4.50      0.00
-     [M/H]     -0.37      0.01
- [alpha/M]      0.17      0.04
+ v_broad_0      1.50      0.00
+     [M/H]     -0.42      0.02
+ [alpha/M]      0.24      0.06
 
-   M/M_Sun      0.82      0.03
+   M/M_Sun      0.81      0.03
    R/R_Sun      0.76      0.02
-   L/L_Sun      0.48      0.04
+   L/L_Sun      0.49      0.04
 
   LD_Coeff         U      3650     0.910
   LD_Coeff         B      4450     0.816
@@ -27,15 +27,16 @@
   LD_Coeff         L     34500     0.000
   LD_Coeff         M     47500     0.000
 
-  SetAbund        26     -0.36      0.01
-  SetAbund        20     -0.23      0.04
-  SetAbund        22     -0.13      0.02
-  SetAbund        12     -0.19      0.05
-  SetAbund        14     -0.23      0.03
-  SetAbund         6     -0.40      0.08
+  SetAbund        26     -0.41      0.02
+  SetAbund        20     -0.21      0.05
+  SetAbund        22     -0.17      0.03
+  SetAbund        12     -0.18      0.04
+  SetAbund        14     -0.26      0.03
+  SetAbund         6     -0.44      0.26
   SetAbund         7      0.01      0.00
-  SetAbund         8     -0.15      0.01
-  SetAbund        16     -0.33      0.00
-  SetAbund        11     -0.22      0.06
-  SetAbund        13     -0.26      0.14
-  SetAbund        19      0.04      0.00
+  SetAbund         8     -0.19      0.01
+  SetAbund        16     -0.45      0.09
+  SetAbund        11     -0.24      0.06
+  SetAbund        13     -0.24      0.02
+  SetAbund        19     -0.61      0.49
+  SetAbund        63      0.56      0.02
