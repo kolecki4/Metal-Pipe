@@ -18,6 +18,7 @@ This is the C++ library on which the core line-fitting algorithm is based. On my
 
 On the other hand, if your favorite package manager does not have a GSL package ready, or you do not have write access to `/usr/include`, you will need to compile this package from source. Doing so in most cases should install GSL in the default (correct) location
 
+**NICHE ISSUE:** Sometimes the install script will fail on compiling the C++ code complaining about multiple declarations of `isnan` and `isinf` functions. This is an issue as of the latest stable release of GSL (v2.8). To fix it, go to the ...`/include/gsl` directory, open `gsl_math.h`, and change line 22 from `#include <math.h>` to `#include <cmath>`.
 
 ### 2. Determine how many cores/threads your system has, and how many you want Metal Pipe to have access to
 If you don't know how many threads your CPU has, you can look up the CPU model name online and find the information. Alternatively, try runnning `lscpu | grep "Model name\|CPU(s):\|Thread(s)\|Core(s)\|Socket(s)"` from the command line. This will give you a number of threads, listed as "CPU(s)" and tell you your CPU model name. 
