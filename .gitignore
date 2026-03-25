@@ -16,8 +16,8 @@ RunAbundanceOnGoodLines
 batchRun.py
 example-tauCet/
 linemakeconsoleout.txt
-./linemake/linemakeconsoleout.txt
-./mpplib/modelatmosphere.txt
+linemake/linemakeconsoleout.txt
+mpplib/modelatmosphere.txt
 moog/*.o
 Barklem.dat
 BarklemUV.dat
