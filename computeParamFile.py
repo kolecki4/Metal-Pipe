@@ -2,14 +2,19 @@ import numpy as np
 import sys
 import os
 from mpplib.newIsoLib import *
-def setParams(starName, workDir, outFile, metal = 0, alpha = 0, runNum = 0):
+def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum = 0):
+    
+    if runNum > 0:
+        try:
+            os.remove(outputFolder + outputFile)
+        except FileNotFoundError:
+            sys.exit(66) 
+   
     bands = "U,B,V,R,I,J,H,K,L,M".split(",")    
     filterWaves = "3650,4450,5510,6580,8060,12200,16300,21900,34500,47500".split(',')
     filterWaves = [float(i) for i in filterWaves]
 
     targ = starName
-    outputFolder = workDir
-    outputFile = outFile
     elements = np.array([26,20,22,12,14,6,7,8,16,11,13,63])
     #elements = np.array([26])
 
@@ -209,4 +214,4 @@ if __name__ == "__main__":
         else:
             print("Usage: computeParamFile.py [Star Name] [Star Directory] [Output Param File] (Metallicity = 0) (alpha = 0) (runNum = 0)")
     except ValueError:
-        exit(1)
+        sys.exit(1)
