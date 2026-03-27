@@ -78,7 +78,7 @@ else
         if [[ $statusComputeParams -ne 0 ]];
         then
             echo "There was a problem executing computeParamFile.py"
-            return 1;
+            exit 1;
         fi;
         ((i++))
     done

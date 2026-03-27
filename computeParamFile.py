@@ -4,11 +4,6 @@ import os
 from mpplib.newIsoLib import *
 def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum = 0):
     
-    if runNum > 0:
-        try:
-            os.remove(outputFolder + outputFile)
-        except FileNotFoundError:
-            sys.exit(66) 
    
     bands = "U,B,V,R,I,J,H,K,L,M".split(",")    
     filterWaves = "3650,4450,5510,6580,8060,12200,16300,21900,34500,47500".split(',')
@@ -52,12 +47,20 @@ def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum =
 
         lastMetallicity = readInputMetallicity(outputFolder+outputFile)
         lastAlpha= readInputAlphaEnhancement(outputFolder+outputFile)
+        elements, abundances, errors = readAbundances(outputFolder, outputFile, elements)
+        try:
+            os.remove(outputFolder + outputFile)
+        except FileNotFoundError:
+            sys.exit(66)
+
+
+
         vBroadInit = vBroadFromElement(outputFolder, 26)
         alpha = lastAlpha
         currentMetallicity = 0
         currentAlpha = 0
 
-        elements, abundances, errors = readAbundances(outputFolder, outputFile, elements)
+
         #for i in range(len(initOffsets)):
         initOffsets = [abundances[i] - solarMOOG[int(elements[i])] for i in range(len(elements))]
         initErrors = [errors[i] for i in range(len(elements))]
@@ -213,5 +216,6 @@ if __name__ == "__main__":
             setParams(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]), int(sys.argv[6]))
         else:
             print("Usage: computeParamFile.py [Star Name] [Star Directory] [Output Param File] (Metallicity = 0) (alpha = 0) (runNum = 0)")
-    except ValueError:
+    except Exception as e:
+        print(e)        
         sys.exit(1)

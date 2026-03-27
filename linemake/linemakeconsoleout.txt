@@ -1,8 +1,10 @@
  starting wavelength: 
  ending wavelength: 
 no updated gf values to add in from good list
+adding new line with hfs/iso components:   7426.570      63.1
  add in molecular lines (y/n)? 
  add Kurucz hfs for Fe-group lines without recent
  lab studies, [Sc I, Sc II, & Cu I] (y/n)? 
  DONE!  CHECK THE LINE LIST CAREFULLY!
-REFULLY!
+, Sc II, & Cu I] (y/n)? 
+ DONE!  CHECK THE LINE LIST CAREFULLY!
