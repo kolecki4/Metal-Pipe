@@ -23,7 +23,7 @@ from scipy.interpolate import interp1d
 from astropy.io import fits
 
 
-plt.style.use("/home/jared/pltstyles/jared.mplstyle")
+plt.style.use("mpplib/MetalPipe.mplstyle")
 
 class stellarParameters:    
     def __init__(self,teff = None,steff = None,logg = None,slogg = None,mass = None,smass = None,rad = None,srad = None,lum = None,slum = None,metal = None, alpha = None):

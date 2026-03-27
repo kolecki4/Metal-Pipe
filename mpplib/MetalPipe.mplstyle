@@ -1,0 +1,26 @@
+figure.dpi: 300
+grid.alpha: 0.5
+text.color: "#222222"
+axes.edgecolor: "#444444"
+xtick.color:  "#444444"
+
+ytick.color:  "#444444"
+xtick.labelcolor:  "#222222"
+
+ytick.labelcolor:  "#222222"
+
+lines.linewidth:3
+lines.markersize:10
+
+axes.linewidth: 4
+xtick.major.width: 4
+xtick.minor.width: 4
+ytick.major.width: 4
+ytick.minor.width: 4
+
+xtick.major.size: 8
+xtick.minor.size: 8
+ytick.major.size: 8
+ytick.minor.size: 8
+
+font.size: 18

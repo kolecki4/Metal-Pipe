@@ -18,29 +18,7 @@ solarMOOG = [0,
 ]
 
 size = 24
-plt.rcParams.update({'figure.dpi': 200})
-plt.rcParams.update({'font.size': 24})
-plt.rcParams.update({'font.family': "FreeSans"})
-
-plt.rcParams.update({'axes.linewidth': 4})
-plt.rcParams.update({'xtick.major.width': 4})
-plt.rcParams.update({'xtick.minor.width': 4})
-plt.rcParams.update({'ytick.major.width': 4})
-plt.rcParams.update({'ytick.minor.width': 4})
-
-plt.rcParams.update({'xtick.major.size': 8})
-plt.rcParams.update({'xtick.minor.size': 8})
-plt.rcParams.update({'ytick.major.size': 8})
-plt.rcParams.update({'ytick.minor.size': 8})
-
-plt.rcParams.update({'ytick.labelcolor':  "#222"})
-plt.rcParams.update({'xtick.labelcolor':  "#222"})
-plt.rcParams.update({'ytick.color':  "#444"})
-plt.rcParams.update({'xtick.color':  "#444"})
-
-plt.rcParams.update({"text.color": "#222"})
-plt.rcParams.update({"axes.edgecolor": "#444"})
-plt.rcParams.update({"lines.markersize":10})
+plt.style.use("mpplib/MetalPipe.mplstyle")
 
 labelsize = 24
 
