@@ -669,10 +669,10 @@ def readAbundances(workDir, paramFile, elements):
             
             if len(summary["wav"]) > 15:
                 anythingGood = np.where(summary["chi2"] < 8,1,0).flatten()
-                print(anythingGood)
+                #print(anythingGood)
                 if (np.max(summary["XH"]) - np.min(summary["XH"]) > 1.7):
                     anythingGood = anythingGood | np.where((summary["XH"] + 0.3 > np.max(summary["XH"]) ) | (summary["XH"] - 0.3 < np.min(summary["XH"]) ), 1, 0).flatten()   
-                print(anythingGood)
+                #print(anythingGood)
                 if np.count_nonzero(anythingGood) > 0:
                     summary = summary[anythingGood == 1]
             abundances = np.append(abundances, np.median(summary["XH"]))

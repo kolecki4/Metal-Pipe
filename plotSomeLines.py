@@ -128,7 +128,9 @@ for folder in folders:
             
             ax[i%nRows][i//nRows].set_ylim(np.min(np.append(obs,syn))-0.1,1.1)
             ax[i%nRows][i//nRows].set_xlim(np.min(wav), np.max(wav))
-        print(dataFolder + folder + "/diagnostic_plot.png")    
+        print("---------")        
+        print("Saving " + dataFolder + folder + "/diagnostic_plot.png")
+          
         plt.savefig(dataFolder + folder + "/diagnostic_plot.png")
         plt.close("all")
 
@@ -137,9 +139,9 @@ for folder in folders:
 
         plt.hist(summary["XH"], bins = np.arange(4.5,8.9, 0.05))
         plt.xlabel("[X/H]")
-        print("---------")
-        print(summary["XH"])
-        print("---------")
+        #print("---------")
+        #print(summary["XH"])
+        #print("---------")
         plt.xlim(np.percentile(summary["XH"],1)-0.1,np.percentile(summary["XH"],99)+ 0.1)
         plt.title("Median [X/H] = %.3f +/- %.3f" % (np.median(summary["XH"]),np.std(summary["XH"])/np.sqrt(len(summary))))
 

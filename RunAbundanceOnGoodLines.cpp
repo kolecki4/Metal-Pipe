@@ -191,6 +191,8 @@ int abundanceRunOnFile(std::string paramFile, std::vector<double> &abundances, s
 
             std::cout << "[X/Fe] = " << medAbundance - atmosphereInfo.MonH << " +/- " << stdev << "\n"; 
             if(atmosphereInfo.elementString[j] == "26"  && abs(atmosphereInfo.MonH - medAbundance) > std::max(stdev, 0.024)){
+                std::cout << "[Fe/H] not converged yet\n";
+                std::cout << "Input was " << atmosphereInfo.MonH << "; Output was " << medAbundance << " +/- " << stdev << "\n";   
                 return 1;
             }
 
@@ -200,13 +202,14 @@ int abundanceRunOnFile(std::string paramFile, std::vector<double> &abundances, s
                 stdevAlpha += pow(stdev, 2);
 
                 nAlphaElementsFit++;
-                std::cout << "Alpha alement" << nAlphaElementsFit << "fit\n";
-                std::cout << "ALPHA ELEMENT ABUNDANCE: " << medAbundance-atmosphereInfo.MonH << " - " << atmosphereInfo.AonM << " > " << pow(stdevAlpha,0.5) << "\n";
+                //std::cout << "Alpha alement" << nAlphaElementsFit << "fit\n";
+                //std::cout << "ALPHA ELEMENT ABUNDANCE: " << medAbundance-atmosphereInfo.MonH << " - " << atmosphereInfo.AonM << " > " << pow(stdevAlpha,0.5) << "\n";
 
                 if(nAlphaElementsFit ==2){
                     stdevAlpha = pow(stdevAlpha,0.5);
-                    std::cout << "ALPHA ABUNDANCE NONCONVERGENCE?: " << atmosphereInfo.AonM << " - " << alpha << " > " << stdevAlpha << "\n";
                     if(abs(atmosphereInfo.AonM - alpha) > std::max(stdevAlpha, 0.024) ){
+                        std::cout << "[alpha/Fe] not converged yet\n";
+                        std::cout << "Input was " << atmosphereInfo.AonM << "; Output was " << alpha << " +/- " << stdevAlpha << "\n";                        
                         return 1;
                     }
                 }
