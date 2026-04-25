@@ -43,20 +43,28 @@ void readObsSpec(std::string fName, std::vector<double> &wave, std::vector<doubl
 
     wave.clear();
     flux.clear();
+
     std::ifstream inFile;
     std::string fLine;
+    double value = 0;
 
     inFile.open(fName);
     if(!inFile.fail()){
         int i = 0;
         while(!inFile.eof()){
             if (i % 2 == 0){
-                getline(inFile, fLine, ' ');
-                if (fLine.length() > 0){wave.push_back(stod(fLine));}
+                std::getline(inFile, fLine, ' ');
+                if (fLine.length() > 0){
+                    value = std::stod(fLine);
+                    wave.push_back(value);
+                }
             }
             else{
-                getline(inFile, fLine, '\n');
-                if (fLine.length() > 0){flux.push_back(stod(fLine));}
+                std::getline(inFile, fLine, '\n');
+                if (fLine.length() > 0){
+                    value = std::stod(fLine);                    
+                    flux.push_back(value);
+                }
             }
             i++;
         }
@@ -76,6 +84,8 @@ void readObsSpec(std::string fName, std::vector<double> &wave, std::vector<doubl
 
     std::ifstream inFile;
     std::string fLine;
+    double value = 0;
+
     wave.clear();
     flux.clear();
     error.clear();
@@ -84,17 +94,26 @@ void readObsSpec(std::string fName, std::vector<double> &wave, std::vector<doubl
         int i = 0;
         while(!inFile.eof()){
             if (i % 3 == 0){
-                getline(inFile, fLine, ' ');
-                if (fLine.length() > 0){wave.push_back(stod(fLine));}
+                std::getline(inFile, fLine, ' ');
+                if (fLine.length() > 0){
+                    value = std::stod(fLine);
+                    wave.push_back(value);
+                }
             }
             else if (i % 3 == 1){
-                getline(inFile, fLine, ' ');
-                if (fLine.length() > 0){flux.push_back(stod(fLine));}
+                std::getline(inFile, fLine, ' ');
+                if (fLine.length() > 0){
+                    value = std::stod(fLine);
+                    flux.push_back(value);
+                }
             }
 
             else{
-                getline(inFile, fLine, '\n');
-                if (fLine.length() > 0){error.push_back(stod(fLine));}
+                std::getline(inFile, fLine, '\n');
+                if (fLine.length() > 0){
+                    value = std::stod(fLine);
+                    error.push_back(value);
+                }
             }
             i++;
         }
@@ -116,25 +135,32 @@ void readSynSpec(std::string fName, std::vector<double> &wave, std::vector<doubl
     flux.clear();
     
     std::ifstream inFile;
+    double value = 0;
     inFile.open(fName);
 
     std::string inLine;
-    getline(inFile, inLine, '\n');
-    getline(inFile, inLine, '\n');
+    std::getline(inFile, inLine, '\n');
+    std::getline(inFile, inLine, '\n');
 
     int i = 0;
     while(!inFile.eof()){
-        getline(inFile, inLine, ' ');
+        std::getline(inFile, inLine, ' ');
         if(inLine.length() > 0){
 
             if (i % 2 == 0){
-                try{wave.push_back(std::stof(inLine));}
+                try{
+                    value = std::stod(inLine);
+                    wave.push_back(value);
+                }
                 catch(...){break;}
                 i++;
 
             }
             else{
-                try{flux.push_back(std::stof(inLine));}
+                try{
+                    value = std::stod(inLine);
+                    flux.push_back(value);
+                }
                 catch(...){break;}
                 i++;
             }
@@ -278,7 +304,7 @@ void updateParFile(parFileInfo updatedParams){
     std::string fLine;
     inFile.open(updatedParams.parFile);
     while(fLine.find("abundances") == std::string::npos){
-        getline(inFile,fLine, '\n');
+        std::getline(inFile,fLine, '\n');
         parLines.push_back(fLine);
         if(inFile.eof()){
             throw std::runtime_error("Check that batch.par exists and is formatted correctly\n");

@@ -52,7 +52,7 @@ void atmosphere::readFromFile(std::string fileName){
     }
 
     while(!inFile.eof()){
-        getline(inFile, inLine);
+        std::getline(inFile, inLine);
         if(inLine.substr(0,10).find("WorkDir") != std::string::npos){
             workDir = inLine.substr(11);
         }
@@ -64,7 +64,7 @@ void atmosphere::readFromFile(std::string fileName){
             std::string tempElement;
             int tempNum;
             std::string tempDirName;
-            while(getline(atomList,tempElement, ',')){
+            while(std::getline(atomList,tempElement, ',')){
                 tempNum = std::stoi(tempElement);
                 tempElement = std::to_string(tempNum);
                 elementString.push_back(tempElement);
@@ -79,26 +79,26 @@ void atmosphere::readFromFile(std::string fileName){
             }
         }
         else if(inLine.substr(0,10).find("T_eff") != std::string::npos){
-            Teff = stod(inLine.substr(10,10));
+            Teff = std::stod(inLine.substr(10,10));
         }
         else if(inLine.substr(0,10).find("log(g)") != std::string::npos){
-            logg = stod(inLine.substr(10,10));
+            logg = std::stod(inLine.substr(10,10));
         }
         else if(inLine.substr(0,10).find("v_micro") != std::string::npos){
-            v_micro = stod(inLine.substr(10,10));
+            v_micro = std::stod(inLine.substr(10,10));
         }
         else if(inLine.substr(0,10).find("v_broad_0") != std::string::npos){
-            v_broad_init = stod(inLine.substr(10,10));
+            v_broad_init = std::stod(inLine.substr(10,10));
         }
         else if(inLine.substr(0,10).find("[M/H]") != std::string::npos){
-            MonH = stod(inLine.substr(10,10));
+            MonH = std::stod(inLine.substr(10,10));
         }
         else if(inLine.substr(0,10).find("[alpha/M]") != std::string::npos){
-            AonM = stod(inLine.substr(10,10));
+            AonM = std::stod(inLine.substr(10,10));
         }
         else if(inLine.substr(0,10).find("LD_Coeff") != std::string::npos){
-            LD_Wavelengths.push_back(stod(inLine.substr(20,10)));
-            LD_Coefficients.push_back(stod(inLine.substr(30,10)));
+            LD_Wavelengths.push_back(std::stod(inLine.substr(20,10)));
+            LD_Coefficients.push_back(std::stod(inLine.substr(30,10)));
 
         }
 
@@ -107,7 +107,7 @@ void atmosphere::readFromFile(std::string fileName){
         }
     }
     inFile.close();
-    if(Teff < 4500){
+    if(Teff < 4600){
         useMolecules = true;
     }
 

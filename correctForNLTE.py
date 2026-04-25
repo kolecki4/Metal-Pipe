@@ -125,7 +125,7 @@ teffs = teffs[(np.abs(teffs - teff) < 1500)]
 loggs = loggs[(np.abs(loggs - logg) <= 2)]
 feabs = feabs[(np.abs(feabs - mh) <= 2)]
 vmics = vmics[(np.abs(vmics - xi) <= 0.5)]
-lgeps = lgeps[(np.abs(lgeps - ab) < 1)]
+lgeps = lgeps[(np.abs(lgeps - ab) < 1.5)]
 
 
 def gridcorrection(teff,logg,fe,xi,leps,wav):
@@ -300,32 +300,33 @@ print("Non-LTE corrections for " + element)
 w, c = interpcorrection(teff,logg,xi,mh,ab)
 if element == "O":
 
-    with open(outputFolder + "nlte.txt", "w") as f:
-        print("For the O I triplet at 7770A: delta = %.2f" % c[w == 777.0 ], file = f)
-        print("    7772A: delta = %.3f" % c[w == 777.2 ], file = f)
-        print("    7774A: delta = %.3f" % c[w == 777.4 ], file = f)
-        print("    7775A: delta = %.3f" % c[w == 777.5 ], file = f)
 
-    print("For the O I triplet at 7770A: delta = %.2f" % c[w == 777.0 ])
-    print("    7772A: delta = %.3f" % c[w == 777.2 ])
-    print("    7774A: delta = %.3f" % c[w == 777.4 ])
-    print("    7775A: delta = %.3f" % c[w == 777.5 ])
+    with open(outputFolder + "nlte.txt", "w") as f:
+        print("For the O I triplet at 7770A: delta = %.2f" % c[w == 777.0 ][0][0], file = f)
+        print("    7772A: delta = %.3f" % c[w == 777.2 ][0][0], file = f)
+        print("    7774A: delta = %.3f" % c[w == 777.4 ][0][0], file = f)
+        print("    7775A: delta = %.3f" % c[w == 777.5 ][0][0], file = f)
+
+    print("For the O I triplet at 7770A: delta = %.2f" % c[w == 777.0 ][0][0])
+    print("    7772A: delta = %.3f" % c[w == 777.2 ][0][0])
+    print("    7774A: delta = %.3f" % c[w == 777.4 ][0][0])
+    print("    7775A: delta = %.3f" % c[w == 777.5 ][0][0])
 
 if element == "K":
     with open(outputFolder + "nlte.txt", "a") as f:
-        print("For the K I line at 7698A: delta = %.2f" % c[w == 7698.0 ], file = f)
+        print("For the K I line at 7698A: delta = %.2f" % c[w == 7698.0 ][0][0], file = f)
 
-    print("For the K I line at 7698A: delta = %.2f" % c[w == 7698.0 ])
+    print("For the K I line at 7698A: delta = %.2f" % c[w == 7698.0 ][0][0])
 
 
 if element == "Ca":
     with open(outputFolder + "nlte.txt", "a") as f:
-        print("For Ca in the Optical: delta = %.2f" % c[w == 5500.0 ], file = f)
+        print("For Ca in the Optical: delta = %.2f" % c[w == 5500.0 ][0][0], file = f)
 
-    print("For Ca in the Optical: delta = %.2f" % c[w == 5500.0 ])
+    print("For Ca in the Optical: delta = %.2f" % c[w == 5500.0 ][0][0])
 if element == "Ti":
     with open(outputFolder + "nlte.txt", "a") as f:
-        print("For Ti in the Optical: delta = %.2f" % c[w == 5500.0 ], file = f)
+        print("For Ti in the Optical: delta = %.2f" % c[w == 5500.0 ][0][0], file = f)
 
-    print("For Ti in the Optical: delta = %.2f" % c[w == 5500.0 ])
+    print("For Ti in the Optical: delta = %.2f" % c[w == 5500.0 ][0][0])
 

@@ -2,16 +2,16 @@ import numpy as np
 import sys
 import os
 from mpplib.newIsoLib import *
-def setParams(starName, workDir, outFile, metal = 0, alpha = 0, runNum = 0):
+def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum = 0):
+    
+   
     bands = "U,B,V,R,I,J,H,K,L,M".split(",")    
     filterWaves = "3650,4450,5510,6580,8060,12200,16300,21900,34500,47500".split(',')
     filterWaves = [float(i) for i in filterWaves]
 
     targ = starName
-    outputFolder = workDir
-    outputFile = outFile
-    elements = np.array([26,20,22,12,14,6,7,8,16,11,13,19])
-    #elements = np.array([26,6])
+    elements = np.array([26,20,22,12,14,6,7,8,16,11,13,63])
+    #elements = np.array([26])
 
     specFile = ""
     files = os.listdir(outputFolder)
@@ -25,7 +25,7 @@ def setParams(starName, workDir, outFile, metal = 0, alpha = 0, runNum = 0):
 
     MonHerror = 0
     AonMerror = 0
-
+    vBroadInit = 7.5
     lastMetallicity = 0
     lastAlpha = 0
 
@@ -47,11 +47,20 @@ def setParams(starName, workDir, outFile, metal = 0, alpha = 0, runNum = 0):
 
         lastMetallicity = readInputMetallicity(outputFolder+outputFile)
         lastAlpha= readInputAlphaEnhancement(outputFolder+outputFile)
+        elements, abundances, errors = readAbundances(outputFolder, outputFile, elements)
+        try:
+            os.remove(outputFolder + outputFile)
+        except FileNotFoundError:
+            sys.exit(66)
+
+
+
+        vBroadInit = vBroadFromElement(outputFolder, 26)
         alpha = lastAlpha
         currentMetallicity = 0
         currentAlpha = 0
 
-        elements, abundances, errors = readAbundances(outputFolder, outputFile, elements)
+
         #for i in range(len(initOffsets)):
         initOffsets = [abundances[i] - solarMOOG[int(elements[i])] for i in range(len(elements))]
         initErrors = [errors[i] for i in range(len(elements))]
@@ -66,7 +75,7 @@ def setParams(starName, workDir, outFile, metal = 0, alpha = 0, runNum = 0):
 
 
         currentAlpha = np.average([  initOffsets[np.argmin(np.abs(elements - 20))]  ,  initOffsets[np.argmin(np.abs(elements - 22))]  ]) -(metal)
-        if np.abs(currentAlpha-lastAlpha) > max(AonMerror,0.01):
+        if np.abs(currentAlpha-lastAlpha) > max(AonMerror,0.024):
             alpha = ((9*currentAlpha + lastAlpha)/10)
             for i in range(len(elements)):
                 pass#initOffsets[i] = 0
@@ -74,7 +83,7 @@ def setParams(starName, workDir, outFile, metal = 0, alpha = 0, runNum = 0):
             alpha = currentAlpha
 
         currentMetallicity = initOffsets[np.argmin(np.abs(elements - 26))]
-        if np.abs(currentMetallicity-lastMetallicity) > max(MonHerror,0.01):
+        if np.abs(currentMetallicity-lastMetallicity) > max(MonHerror,0.024):
             metal = ((9*currentMetallicity + lastMetallicity)/10)
             for i in range(len(elements)):
                 initOffsets[i] = 0
@@ -182,7 +191,7 @@ def setParams(starName, workDir, outFile, metal = 0, alpha = 0, runNum = 0):
         print("%10s%10i%10i" % ("T_eff", params.teff, params.steff), file = f)
         print("%10s%10.2f%10.2f" % ("log(g)", params.logg, params.slogg), file = f)
         print("%10s%10.2f%10.2f"%("v_micro", 1.5,0.0), file = f)
-        print("%10s%10.2f%10.2f"%("v_broad_0", 4.5,0.0), file = f)
+        print("%10s%10.2f%10.2f"%("v_broad_0", vBroadInit,0.0), file = f)
 
         print("%10s%10.2f%10.2f" % ("[M/H]",params.metal, MonHerror), file = f)
         print("%10s%10.2f%10.2f" % ("[alpha/M]", params.alpha, AonMerror), file = f)
@@ -207,5 +216,6 @@ if __name__ == "__main__":
             setParams(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]), int(sys.argv[6]))
         else:
             print("Usage: computeParamFile.py [Star Name] [Star Directory] [Output Param File] (Metallicity = 0) (alpha = 0) (runNum = 0)")
-    except ValueError:
-        exit(1)
+    except Exception as e:
+        print(e)        
+        sys.exit(1)

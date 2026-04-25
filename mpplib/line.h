@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <iomanip>
 #include "spectrumData.h"
 #include "statistics.h"
 #include "externalInterfaces.h"
@@ -140,6 +141,7 @@ struct synthInfo{
 
     double centralWavelength;
     double widthOfSynthesis;
+    double synthesisResolution;
     double instBroadWidthPixels;
     double instBroadFWHM;
 
@@ -212,6 +214,13 @@ line::line(double lineWav, int atomicNum, bool useMolecules,const spectrumData& 
     lineInfo.v_broad = 0;
     lineInfo.widthOfSynthesis = 0;
 
+    if(lineWav > 10000){
+        lineInfo.synthesisResolution = 0.02;    
+    }
+    else{
+        lineInfo.synthesisResolution = 0.01;    
+    }
+
     considerMolecules = useMolecules;
     originalSpectrum = cutFromSpectrum;
 
@@ -273,7 +282,7 @@ void line::writeParFile(){
         throw std::runtime_error("sfhsfghsdfghsdfghdfgh");
     }
     while(fLine.find("abundances") == std::string::npos){
-        getline(inFile,fLine, '\n');
+        std::getline(inFile,fLine, '\n');
 
 
         if(fLine.find("standard_out") == 0){
@@ -311,7 +320,7 @@ void line::writeParFile(){
         parLines.push_back(tempString);
     }
 
-    sprintf(tempString, "synlimits\n%10.2f%10.2f%10.2f%10.2f", lineInfo.centralWavelength - lineInfo.widthOfSynthesis/2, lineInfo.centralWavelength + lineInfo.widthOfSynthesis/2, 0.01, 20.0);
+    sprintf(tempString, "synlimits\n%10.2f%10.2f%10.2f%10.2f", lineInfo.centralWavelength - lineInfo.widthOfSynthesis/2, lineInfo.centralWavelength + lineInfo.widthOfSynthesis/2, lineInfo.synthesisResolution, 20.0);
     parLines.push_back(tempString);
 
     sprintf(tempString, "plotpars       1\n%10.2f%10.2f%10.2f%10.2f\n 0 0 0 1.0", lineInfo.centralWavelength - lineInfo.widthOfSynthesis/2 , lineInfo.centralWavelength + lineInfo.widthOfSynthesis/2 , 0.0, 1.3);
@@ -372,7 +381,7 @@ void line::calculateFitRegions(){
     else{
 
             while(!inFile.eof() && i < 10){
-            getline(inFile,fLine, '\n');
+            std::getline(inFile,fLine, '\n');
             if(fLine.find("SORRY") != std::string::npos){
                 throw std::runtime_error("Linemake won't work over this window. It can't handle the thousands digit of the wavelength range changing.\n");
             };
@@ -405,7 +414,7 @@ void line::calculateFitRegions(){
             }
         }
     } 
-    rangeToContinuumFit = maxWave - minWave + 5;
+    rangeToContinuumFit = maxWave - minWave + 8;
 
     minWave = 9999999;
     maxWave = 0;
@@ -420,7 +429,7 @@ void line::calculateFitRegions(){
             }
         }
     } 
-    rangeToChi2Fit = (maxWave - minWave + 0.5)*1.1;
+    rangeToChi2Fit = (maxWave - minWave + 1)*1.1;
     rangesSet = true;
 }
 
@@ -439,7 +448,7 @@ void line::renormalizeObs(){
     for(int i = 0; i < obsWaveGrid.size(); i++){
         point = obsWaveGrid.getRow(i);
 
-        if( (point[3] > 0.97 && point[3] < 1.01) && (point[1] > 0.97 && point[1] < 1.1) ) {
+        if( (point[3] > 0.97 && point[3] < 1.03) && (point[1] > 0.95 && point[1] < 1.1) ) {
             continuumPointsObs.push_back(point[1]);
             continuumPointsSyn.push_back(point[3]);
             continuumPointsErr.push_back(point[2]);
@@ -506,7 +515,7 @@ void line::setLineList(){
     int i = 0;
     inFile.open("linemakeconsoleout.txt");
     while(!inFile.eof() && i < 10){
-        getline(inFile,fLine, '\n');
+        std::getline(inFile,fLine, '\n');
         if(fLine.find("SORRY") != std::string::npos){
             throw std::runtime_error("Linemake won't work over this window. It can't handle the thousands digit of the wavelength range changing.\n");
         };
@@ -532,7 +541,7 @@ void line::crossCorrelateObs(){
     double sum;
     std::vector<double> obsGridWavelengthsShifted = obsWaveGrid.getColumn("wavelength");
     std::vector<double> point;
-    for(double i = -.1; i < .1; i+=0.0005){
+    for(double i = -.9; i < .9; i+=0.0005){
         sum = 0;
 
 
@@ -763,7 +772,7 @@ void line::setEPandLoggf(){
 void line::outputBestFitAbundance(std::string fileName, double atmosphereMetallicity){
     std::ofstream outFile;
     std::string outLine;
-    
+    double wavelength = static_cast<double>(std::round(lineInfo.centralWavelength*100)/100.0);
     double solar[96] = {0,
             12.00,10.93, 1.05, 1.38, 2.70, 8.43, 7.83, 8.69, 4.56, 7.93,
             6.24, 7.60, 6.45, 7.51, 5.41, 7.12, 5.50, 6.40, 5.03, 6.34,
@@ -784,7 +793,9 @@ void line::outputBestFitAbundance(std::string fileName, double atmosphereMetalli
         outFile.open(fileName);
     }
 
-    outFile << std::round(lineInfo.centralWavelength*100)/100 << " ";
+    //wavelength = ;
+    outFile << std::setprecision(10);
+    outFile << wavelength << " ";
     outFile << lineInfo.abundanceOffsets.getElement(lineInfo.species, "num").offset + atmosphereMetallicity + solar[lineInfo.species] << " ";
     outFile << lineInfo.v_broad << " ";
     outFile << synGridChi2() << "\n";

@@ -18,29 +18,7 @@ solarMOOG = [0,
 ]
 
 size = 24
-plt.rcParams.update({'figure.dpi': 200})
-plt.rcParams.update({'font.size': 24})
-plt.rcParams.update({'font.family': "FreeSans"})
-
-plt.rcParams.update({'axes.linewidth': 4})
-plt.rcParams.update({'xtick.major.width': 4})
-plt.rcParams.update({'xtick.minor.width': 4})
-plt.rcParams.update({'ytick.major.width': 4})
-plt.rcParams.update({'ytick.minor.width': 4})
-
-plt.rcParams.update({'xtick.major.size': 8})
-plt.rcParams.update({'xtick.minor.size': 8})
-plt.rcParams.update({'ytick.major.size': 8})
-plt.rcParams.update({'ytick.minor.size': 8})
-
-plt.rcParams.update({'ytick.labelcolor':  "#222"})
-plt.rcParams.update({'xtick.labelcolor':  "#222"})
-plt.rcParams.update({'ytick.color':  "#444"})
-plt.rcParams.update({'xtick.color':  "#444"})
-
-plt.rcParams.update({"text.color": "#222"})
-plt.rcParams.update({"axes.edgecolor": "#444"})
-plt.rcParams.update({"lines.markersize":10})
+plt.style.use("mpplib/MetalPipe.mplstyle")
 
 labelsize = 24
 
@@ -85,15 +63,18 @@ for folder in folders:
 
 
         # Remove near-duplicate wavelengths
+        files = files[np.unique(summary["wav"], return_index = True)[1]]
         summary = summary[np.unique(summary["wav"], return_index = True)[1]]
-
         size = len(summary["wav"])
 
-            
+        #print("files %i summary %i" % (len(files), len(summary)))
         #Remove obviously bad abundances
         if np.max(summary["XH"]) - np.min(summary["XH"]) > 1.5:
             files = files[(summary["XH"] > 0.3 + np.min(summary["XH"])) & (summary["XH"] < np.max(summary["XH"])-0.3) ]
             summary = summary[(summary["XH"] > 0.3 + np.min(summary["XH"])) & (summary["XH"] < np.max(summary["XH"])-0.3) ]
+
+#        for i in range(len(files)):
+#            print(files[i], np.argsort(summary["chi2"])[i])
 
         if len(files) > 9:
             Best = files[np.argsort(summary["chi2"])][0:9]
@@ -147,7 +128,9 @@ for folder in folders:
             
             ax[i%nRows][i//nRows].set_ylim(np.min(np.append(obs,syn))-0.1,1.1)
             ax[i%nRows][i//nRows].set_xlim(np.min(wav), np.max(wav))
-        print(dataFolder + folder + "/diagnostic_plot.png")    
+        print("---------")        
+        print("Saving " + dataFolder + folder + "/diagnostic_plot.png")
+          
         plt.savefig(dataFolder + folder + "/diagnostic_plot.png")
         plt.close("all")
 
@@ -156,6 +139,9 @@ for folder in folders:
 
         plt.hist(summary["XH"], bins = np.arange(4.5,8.9, 0.05))
         plt.xlabel("[X/H]")
+        #print("---------")
+        #print(summary["XH"])
+        #print("---------")
         plt.xlim(np.percentile(summary["XH"],1)-0.1,np.percentile(summary["XH"],99)+ 0.1)
         plt.title("Median [X/H] = %.3f +/- %.3f" % (np.median(summary["XH"]),np.std(summary["XH"])/np.sqrt(len(summary))))
 

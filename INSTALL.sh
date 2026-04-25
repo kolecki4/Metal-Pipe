@@ -6,7 +6,7 @@
 
 # As an example, this is the correct setup for Mac OS 
 # if GSL was installed with Homebrew
-gppargs="-I/opt/homebrew/include -L/opt/homebrew/lib"
+gppargs=""
 
 
 
@@ -16,6 +16,8 @@ gppargs="-I/opt/homebrew/include -L/opt/homebrew/lib"
 
 
 # Unique requirements for Linux
+
+autogppargs=""
 if [[ $OSTYPE == *"linux"* ]];
 then
     # Check that GCC is installed
@@ -118,7 +120,7 @@ then
             echo "Make sure you set the right g++ compiler flags to point it to where GSL is installed"
         fi;
     else
-        gppargs=" -I/opt/homebrew/include -L/opt/homebrew/lib"
+        autogppargs=" -I/opt/homebrew/include -L/opt/homebrew/lib"
     fi;
 
 
@@ -127,13 +129,15 @@ then
     if [ $? -eq 0 ];
     then
         echo "There is a conda environment active. This will mess up the installation process."
-        echo "Please run 'conda deactivate' before procedding. You are free to reactivate your conda environment once the installation script has been run"
+        echo "Please run 'conda deactivate' before proceeding. You are free to reactivate your conda environment once the installation script has been run"
         exit 1
     fi;
 fi;
 
-
-
+if [[ $gppargs == "" ]];
+then
+    gppargs=$autogppargs
+fi;
 
 
 # Compile RunAbundanceOnGoodLines.cpp 

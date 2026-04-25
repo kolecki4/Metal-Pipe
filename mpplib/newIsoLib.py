@@ -23,7 +23,7 @@ from scipy.interpolate import interp1d
 from astropy.io import fits
 
 
-#plt.style.use("/home/jared/pltstyles/jared.mplstyle")
+plt.style.use("mpplib/MetalPipe.mplstyle")
 
 class stellarParameters:    
     def __init__(self,teff = None,steff = None,logg = None,slogg = None,mass = None,smass = None,rad = None,srad = None,lum = None,slum = None,metal = None, alpha = None):
@@ -82,20 +82,26 @@ def queryPhotometry(star):
                 gaia2 = i[0]
         gaia2 = gaia2.replace("Gaia DR2", "")
     except IndexError:
-        pass
+        gaia2 = None
+    except AttributeError: 
+        gaia2 = None 
+        try:
+            gaia3 = ids[["Gaia DR3" in i for i in ids]][0]
+            gaia3 = gaia3.replace("Gaia DR3", "") 
+        except IndexError:
+            gaia3 = None
+        except AttributeError:
+            gaia3 = None
 
-    try:
-        gaia3 = ids[["Gaia DR3" in i for i in ids]][0]
-        gaia3 = gaia3.replace("Gaia DR3", "") 
-    except IndexError:
-        gaia3 = None
+    print(star)
 
-    #print(sim["ID_GAIA_DR2"])
     if gaia2 is not None:
         gaiaid=gaia2
         gaia2Vizier = Vizier(columns = ["Source", "Plx", "e_Plx", "Gmag", "e_Gmag", "BPmag", "e_BPmag", "RPmag", "e_RPmag"])
         gaia2Vizier.ROW_LIMIT = -1
-        gai=gaia2Vizier.query_object(star, catalog = 'I/345/gaia2', radius = 120*u.arcsec, coordinate_frame = "J2016")[0]
+        gai=gaia2Vizier.query_object(star, catalog = 'I/345/gaia2', radius = 180*u.arcsec, coordinate_frame = "J2016")
+        print(gai)
+        gai=gai[0]
         gai = gai[np.argwhere(gai["Source"] == int(gaiaid))[0][0]]
         if type(gai['Plx']) == np.float64:
             plx=gai['Plx']
@@ -547,7 +553,7 @@ def MISTgetTandG(metal, ageRange, target = None, SIMBADphot = None):
     ax[0].set_xlabel("EEP")
     ax[0].set_ylabel("Age (Gyr)")
     ax[0].set_title("Probability Grid")
-    ax[0].set_yticks(range(len(availages)), labels = ["%.1f" % i for i in availages])
+    ax[0].set_yticks([np.argmin(np.abs(availages - i)) for i in [0.1,0.2,0.5,1,2,5,10]], labels = ["%.3g" % i for i in [0.1,0.2,0.5,1,2,5,10]])
     ax[1].plot(waves,imags, marker = 'o', label= "Best-fit Grid Point", lw =3, color = "#222")
     for j in range(len(bands)):
         ax[1].annotate(bands[j],(waves[j],imags[j]), (waves[j]-75,imags[j]-0.1))
@@ -557,7 +563,7 @@ def MISTgetTandG(metal, ageRange, target = None, SIMBADphot = None):
     ax[1].set_ylim(ax[1].get_ylim()[::-1])
     ax[1].set_xlabel("Filter Wavelength (nm)")
     ax[1].set_title("Photometric Fit")
-    #TODO : Check the labels on these fellas
+
     ax[1].errorbar(waves,smags, yerr = emags, marker = "o", lw = 3, label= "Stellar Photometry", color = "#042069")
     ax[1].legend()
 
@@ -659,10 +665,16 @@ def readAbundances(workDir, paramFile, elements):
     for i in elements:
         try:
             summary = np.genfromtxt(workDir + "%i" % i + "/abundanceSummary.txt", names = ["wav", "[X/H]", "v_broad", "chi2"], ndmin = 2)
-
-            if len(summary) > 15:
-                summary = summary[summary["chi2"] < 3]
             
+            
+            if len(summary["wav"]) > 15:
+                anythingGood = np.where(summary["chi2"] < 8,1,0).flatten()
+                #print(anythingGood)
+                if (np.max(summary["XH"]) - np.min(summary["XH"]) > 1.7):
+                    anythingGood = anythingGood | np.where((summary["XH"] + 0.3 > np.max(summary["XH"]) ) | (summary["XH"] - 0.3 < np.min(summary["XH"]) ), 1, 0).flatten()   
+                #print(anythingGood)
+                if np.count_nonzero(anythingGood) > 0:
+                    summary = summary[anythingGood == 1]
             abundances = np.append(abundances, np.median(summary["XH"]))
             errorbars = np.append(errorbars, np.std(summary["XH"])/np.sqrt(len(summary)))
 
@@ -691,7 +703,10 @@ def readInputAlphaEnhancement(paramFile):
         if "[alpha/M]" in line:
             return float(line[10:20]) 
 
+def vBroadFromElement(workDir, element):
 
+    summary = np.genfromtxt(workDir + "%i" % element + "/abundanceSummary.txt", names = ["wav", "[X/H]", "v_broad", "chi2"], ndmin = 2)
+    return np.nanmedian(summary["v_broad"])
 
 solarMOOG = [0,
        12.00,10.93, 1.05, 1.38, 2.70, 8.43, 7.83, 8.69, 4.56, 7.93,
