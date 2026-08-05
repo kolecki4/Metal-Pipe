@@ -8,7 +8,12 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multimin.h>
 
+
+// Wrapper function for what minimizing chi^2 as a function of X/Fe and v_broad
+// (Peculiar format is needed to interface with the gsl minimizer)
 double functionToMinimize(const gsl_vector *v, void *p){
+
+    // 
     line *lineToFit = static_cast<line*>(p);
 
     double newOffset = gsl_vector_get(v,0);
@@ -93,7 +98,11 @@ std::vector<double> chi2MinByAbundance(line &lineToFit){
 
 
 int fitLine(line &lineToFit, atmosphere &atmosphereToFit, std::vector<double> &abundances, std::vector<double> &vbroads, std::vector<double> &chi2s, std::string outDataDir){
+    
+    // Stop threads from writing to output arrays at the same time
     std::mutex arrayWrite;
+
+    // Tell Metal Pipe whether this line is "good"
     bool badLine = false;
 
     // Find what the resolution of the spectrum is

@@ -9,9 +9,14 @@
 #include <vector>
 
 
+// A stupid data structure that shouldn't exist
+// But it stores abundance data by atomic number and offset from mh+alpha
 struct abListEntry{
+
     int atomicNumber;
     double offset;
+
+    // Constructor
     abListEntry(int n, double o){
         atomicNumber = n;
         offset = o;
@@ -19,6 +24,8 @@ struct abListEntry{
 };
 
 
+// Class that manages the abundance data for a given atmosphere?
+// TODO: Move abundanceList and abListEntry to an abundanceList.cpp file
 class abundanceList{
     public:
         abListEntry getElement(int element, std::string mode);
@@ -32,6 +39,8 @@ class abundanceList{
         std::vector<abListEntry> abundances;
 };
 
+
+// Return an abListEntry (Z, offset) from abundanceList
 abListEntry abundanceList::getElement(int element, std::string mode){
     if(length > 0){
 
@@ -51,8 +60,11 @@ abListEntry abundanceList::getElement(int element, std::string mode){
     return abListEntry(0,0);
 }
 
+// Add a new abListEntry without setting an offset
 void abundanceList::addNewElement(int element){
     bool alreadyPresent = false;
+
+    // If the element is already there, do nothing
     if(length > 0){
         for(int i = 0; i < length; i++){
             if (abundances[i].atomicNumber == element){
@@ -61,12 +73,15 @@ void abundanceList::addNewElement(int element){
             }
         }
     }
+
+    // If not, add it to the list
     if(!alreadyPresent){
         abundances.push_back(abListEntry(element,0.0));
         length++;
     }
 }
 
+// Add a new abListEntry with an associated offset
 void abundanceList::addNewElement(int element, double offset){
     
     bool alreadyPresent = false;
@@ -84,6 +99,7 @@ void abundanceList::addNewElement(int element, double offset){
     }
 }
 
+// Update an existing abundance offset
 void abundanceList::updateElement(int element, double offset){
         if(length > 0){
         for(int i = 0; i < length; i++){
@@ -95,6 +111,7 @@ void abundanceList::updateElement(int element, double offset){
     }
 }
 
+// Remove an element from the abundanceList (resets it to follow scaled-solar)
 void abundanceList::removeElement(int element){
     if(length > 0){
         for(int i = 0; i < length; i++){
@@ -106,6 +123,8 @@ void abundanceList::removeElement(int element){
     }
 }
 
+
+// Get the length of the abundanceList (How many elements do we have customized?)
 int abundanceList::size(){
     return length;
 }
@@ -127,7 +146,8 @@ int abundanceList::size(){
 
 
 
-
+// This structure contains all the info MOOG needs to synthesize a spectral line
+// TODO: If this is not true, make it true. This will be helpful for integrating MOOG and linemake into Metal Pipe
 struct synthInfo{
 
     int species;
@@ -150,24 +170,39 @@ struct synthInfo{
 
 };
 
+
+// This class defines a given spectral line to be fit by MOOG
 class line{
 
     public:
+
+        //TODO: Yeah why is considerMolecules not in synthInfo?
         bool considerMolecules;
         synthInfo lineInfo;
 
+        // Output file names (will be deprecated on integration)
         std::string parFileName = "batch.par";
         std::string stdOutFile = "MOOGout/out1";
         std::string sumOutFile = "MOOGout/out2";
         std::string smoothedOutFile = "MOOGout/out3";
+        
+        // Helps linemake create a unique folder for each thread (will be deprecated on integration)
         std::string lineMakeSuffix = "";
+
+        // Holds the spectrum data at points defined by the observed spectrum's wavelength grid
         spectrumData obsWaveGrid;
+        // Holds the spectrum data at points defined by the observed spectrum's wavelength grid
         spectrumData synthWaveGrid;
+
+        // TODO: Is this ever used? Remove?
         std::vector<std::string> listOfNearbyLines;
-        std::vector<double> getFitRanges();
+
+        // Constructors
         line();
         line(double lineWav, int atomicNum, bool molecules,const spectrumData& cutFromSpectrum);
 
+
+        // Member functions
         void readObservedLine(std::string fileName);
         void cutOutObservedLine(double width);
         void readSynthesizedLine(std::string fileName);
@@ -177,24 +212,34 @@ class line{
         void interpLDCoeff(std::vector<double> wave, std::vector<double> coeff);
         void MOOGitUp();
 
-
+        // Functions to perform calculations on the spectrum data
         void interpGridsToEachOther();
         void calculateFitRegions();
+        std::vector<double> getFitRanges();
         void renormalizeObs();
         void crossCorrelateObs();
         void setWeightsForChi2(double vBroad);
 
+        // Calculate a Chi^2 based on some metric
         double obsGridChi2();
         double synGridChi2();
         double synGridGradientChi2();
 
+
+        // Output best fit abundance to file (TODO: deprecate?)
         void outputBestFitAbundance(std::string fileName, double atmosphereMetallicity);
 
     private:
+
+        // Don't let anyone change the master input spectrum
         spectrumData originalSpectrum;
+    
+        // Don't let anyone change the fit ranges
         double rangeToChi2Fit = 0;
         double rangeToContinuumFit = 0;
 
+
+        // Checks to make sure all the pre-calculations have been done before the abundance fitting
         bool isInterpolated = false;
         bool isCrossCorrelated = false;
         bool isRenormalized = false;
@@ -203,10 +248,15 @@ class line{
         bool isWeighted = false;
 };
 
+
+
+// Blank constructor
 line::line(){
 
 }
 
+
+// Constructor to cut out a line from the master input spectrum
 line::line(double lineWav, int atomicNum, bool useMolecules,const spectrumData& cutFromSpectrum){
     lineInfo.centralWavelength = lineWav;
     lineInfo.species = atomicNum;
@@ -226,10 +276,13 @@ line::line(double lineWav, int atomicNum, bool useMolecules,const spectrumData& 
 
 }
 
+
+// Get the wavelength ranges for this line
 std::vector<double> line::getFitRanges(){
     return {rangeToContinuumFit, rangeToChi2Fit};
 }
 
+// TODO: Change the function name? Considering all it does is load the master input spectrum
 void line::readObservedLine(std::string fileName){
     
     obsWaveGrid = spectrumData(fileName, "obs");
@@ -240,12 +293,15 @@ void line::readObservedLine(std::string fileName){
 
 }
 
+
+// Interpolate a limb-darkening coefficient for the wavelength of the line
 void line::interpLDCoeff(std::vector<double> wave, std::vector<double> coeff){
 
     lineInfo.LDCoeff = interp1DWrapper({lineInfo.centralWavelength},wave,coeff)[0];
 
 }
 
+// Cuts out a portion of the master input spectrum *width* Angstroms wide, centered at the line wavelength
 void line::cutOutObservedLine(double width){
 
     std::vector<double> masterWavelengths = originalSpectrum.getColumn("wavelength");
