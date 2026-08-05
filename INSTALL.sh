@@ -4,8 +4,7 @@
 
 # IF YOU NEED TO SET G++ TO LINK TO GSL, DO SO HERE ###########################
 
-# As an example, this is the correct setup for Mac OS 
-# if GSL was installed with Homebrew
+
 gppargs=""
 
 

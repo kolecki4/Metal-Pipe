@@ -185,41 +185,14 @@ void interpAtmosphere(double Teff, double logg, double vmic, double M_H, double 
     }
     else{
         std::vector<std::vector<std::vector<double> > > grid0 = {{{0,0},{0,0}},{{0,0},{0,0}}};
-        std::vector<std::vector<double> > model10;
-        std::vector<std::vector<double> > model20;
-        std::vector<std::vector<double> > model30;
-        std::vector<std::vector<double> > model40;
-        std::vector<std::vector<double> > model50;
-        std::vector<std::vector<double> > model60;
-        std::vector<std::vector<double> > model70;
-        std::vector<std::vector<double> > model80;
-        std::vector<double> tauross;
-        std::vector<double> tauross10;
-        std::vector<double> tauross20;
-        std::vector<double> tauross30;
-        std::vector<double> tauross40;
-        std::vector<double> tauross50;
-        std::vector<double> tauross60;
-        std::vector<double> tauross70;
-        std::vector<double> tauross80;
+
+        std::vector<std::vector<double> > model10, model20, model30, model40, model50, model60, model70, model80;
+        std::vector<double> tauross, tauross10, tauross20, tauross30, tauross40, tauross50, tauross60, tauross70, tauross80;
+        
 
         std::vector<std::vector<std::vector<double> > > grid1 = {{{0,0},{0,0}},{{0,0},{0,0}}};
-        std::vector<std::vector<double> > model11;
-        std::vector<std::vector<double> > model21;
-        std::vector<std::vector<double> > model31;
-        std::vector<std::vector<double> > model41;
-        std::vector<std::vector<double> > model51;
-        std::vector<std::vector<double> > model61;
-        std::vector<std::vector<double> > model71;
-        std::vector<std::vector<double> > model81;
-        std::vector<double> tauross11;
-        std::vector<double> tauross21;
-        std::vector<double> tauross31;
-        std::vector<double> tauross41;
-        std::vector<double> tauross51;
-        std::vector<double> tauross61;
-        std::vector<double> tauross71;
-        std::vector<double> tauross81;
+        std::vector<std::vector<double> > model11, model21, model31, model41, model51, model61, model71, model81;
+        std::vector<double> tauross11, tauross21, tauross31, tauross41, tauross51, tauross61, tauross71, tauross81;
 
 
 

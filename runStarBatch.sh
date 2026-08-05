@@ -42,7 +42,7 @@ else
 
             if [[ $starname =~ ^[0-9]+$|^[0-9]+[A-D]$ ]];
             then            
-                starname="HD $starname"
+                starname="HD_$starname"
            
             elif [[ $starname =~ ^T00[0-9]+$ ]];
             then            
@@ -54,24 +54,25 @@ else
             elif [[ ${starname^^} =~ ((^HD)|(^GJ)|(^GL))([0-9]+$|[0-9]+[A-D]$) ]];
             then
                 starname=${starname^^}
-                starname=${starname:0:2}" "${starname:2}
+                starname=${starname:0:2}"_"${starname:2}
 
             elif [[ ${starname^^} =~ (^HIP)|(^KIC)|(^TIC)([0-9]+$|[0-9]+[A-D]$)} ]]
             then
                 starname=${starname^^}
-                starname=${starname:0:3}" "${starname:3}
+                starname=${starname:0:3}"_"${starname:3}
 
             elif [[ ${starname^^} =~ ((^KEPLER-)|(^KEPLER)|(^KOI-)|(^TOI-)|(^K2-)|(^KELT-)|(^WASP-))([0-9]+$|[0-9]+[A-D]$) ]];
             then
                 starname=$starname
             else
-                echo \"$starname\" is not a valid name for a star. I\'m ignoring this folder.
-                needsRun=0
+                #echo \"$starname\" is not a valid name for a star. I\'m ignoring this folder.
+                echo Folder name \"$starname\" assumed SIMBAD-resolvable
+        	#needsRun=1
             fi;
             
             if [[ $needsRun == 1 ]];
             then
-                bash runStar.sh \"$starname\" $folder 0.0
+               ./runStar.sh ${starname} ${folder} 0
             fi;
         fi;
     done

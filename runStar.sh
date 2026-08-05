@@ -1,17 +1,6 @@
 #! /bin/bash
 ARGC=$#
-#echo " ╔═════════════════════════════════════════════════════════════════════════════╗"
-#echo " ║     *__________* ___    __  * ______    ______  * ______  *  _      _     * ║"
-#echo " ║     ___________ │   ╲  ╱  ╲  ╱  __  ╲ *╱  __  ╲  ╱  ____╲  _│ │_ *_│ │_     ║"
-#echo " ║    ____________ │  \ ╲╱    ││  ╱  ╲  ││  ╱  ╲  ││  ╱  ___ │_\`  _││_\`  _│    ║"
-#echo " ║ * _____________ │  │╲  ╱│  ││ │    │ ││ │    │ ││ │  │_  │  │_│    │_│      ║"
-#echo " ║  ______________ │  │ ╲╱ │  ││  ╲__╱  ││  ╲__╱  ││  ╲__╱  │    *     *       ║"
-#echo " ║ _______________ │__│ *  │__│ ╲______╱* ╲______╱  ╲______╱ *            *    ║"
-#echo " ║   *        *                 *                  *               *           ║"
-#echo " ╟─────────────────────────────────────────────────────────────────────────────╢"
-#echo " ║ ░░░░░░░▒▒▒▒▒▒▒▓▓▓▓▓▓▓████████ Beta Version 1.1 ███████▓▓▓▓▓▓▓▒▒▒▒▒▒▒░░░░░░░ ║"
-#echo " ╚═════════════════════════════════════════════════════════════════════════════╝"
-#
+
 echo "╔══════════════════════════════════════════════════════════════════════════════╗"
 echo "║                                                                              ║"
 echo "║                                               ,,,,,,,,;;;;''\                ║"
@@ -22,16 +11,9 @@ echo "║               |   |            ,,,,,,,;;;;;'''''                      
 echo "║                \_/,,,,,;;;''''''''                                           ║"
 echo "║                                                                              ║"
 echo "╟──────────────────────────────────────────────────────────────────────────────╢"
-echo "║ ░░░░░░░▒▒▒▒▒▒▒▓▓▓▓▓▓▓███████  Beta Version 1.6  ███████▓▓▓▓▓▓▓▒▒▒▒▒▒▒░░░░░░░ ║"
+echo "║ ░░░░░░░▒▒▒▒▒▒▒▓▓▓▓▓▓▓███████ Beta Version 1.6.1 ███████▓▓▓▓▓▓▓▒▒▒▒▒▒▒░░░░░░░ ║"
 echo "╚══════════════════════════════════════════════════════════════════════════════╝"
 
-n=$(($RANDOM % 100))
-#echo $n
-if [ $n -lt 10 ];
-then
-    ffplay -autoexit -nodisp "Destruction_Metal_Pole_L_Wave_2_0_0.wav" &>/dev/null &
-
-fi;
 
 if [ $ARGC -ne 3 ];
 then
@@ -61,6 +43,7 @@ else
     if [[ $statusComputeParams -ne 0 ]];
     then
         echo "There was a problem executing computeParamFile.py"
+        echo ${starName} ${workDir} Could not create params.txt on iteration ${i} >> FailedLog
         exit 1;
     fi;
 
@@ -78,6 +61,13 @@ else
         if [[ $statusComputeParams -ne 0 ]];
         then
             echo "There was a problem executing computeParamFile.py"
+            echo ${starName} ${workDir} Could not create params.txt on iteration ${i} >> FailedLog
+            exit 1;
+        fi;
+        if [[ $i -gt 15 ]];
+        then
+            echo "Too many iterations. I give up."
+            echo ${starName} ${workDir} Reached iteration number limit >> FailedLog
             exit 1;
         fi;
         ((i++))
