@@ -60,11 +60,11 @@ std::vector<double> interp1DWrapper(std::vector<double> newXPoints, std::vector<
         // If outside interp range, linearly extrapolate
         if(newXPoints[i] < xData[0]){
             m = (yData[1]-yData[0])/(xData[1]-xData[0]);
-            newYPoints.push_back(m*(newXPoints[i]-xData[0]) + yData[0]);
+            newYPoints.push_back(1);
         }
         else if(newXPoints[i] > xData[xData.size()-1]){
             m = (yData[xData.size()-1]-yData[xData.size()-2])/(xData[xData.size()-1]-xData[xData.size()-2]);
-            newYPoints.push_back(m*(newXPoints[i]-xData[xData.size()-1]) + yData[xData.size()-1]);
+            newYPoints.push_back(1);
         }
         
         else{newYPoints.push_back(gsl_spline_eval(spline_ptr, newXPoints[i], accel_ptr));}

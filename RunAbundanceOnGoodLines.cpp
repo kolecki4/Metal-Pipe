@@ -57,7 +57,7 @@ const double solar2020[96] = {0,
 
 
 
-int abundanceRunOnFile(std::string paramFile){
+int abundanceRunOnFile(std::string paramFile, bool noIter){
 
     // If false, lineListFile must be just a plain text list of wavelengths, one per line
     // (These days this should always be false. Set to true in rare cases)
@@ -132,10 +132,10 @@ int abundanceRunOnFile(std::string paramFile){
         std::vector<double> wavelengths = wholeSpec.getColumn("wavelength");
         if(minWave == 0){minWave = wavelengths[0];}
         if(maxWave == 0){maxWave = wavelengths[wavelengths.size()-1];}
-        while(wavelengthsToTest[0] < minWave){
+        while(std::abs(wavelengthsToTest[0]) < minWave){
             wavelengthsToTest.erase(wavelengthsToTest.begin());
         }
-        while(wavelengthsToTest[wavelengthsToTest.size()-1] > maxWave){
+        while(std::abs(wavelengthsToTest[wavelengthsToTest.size()-1]) > maxWave){
             wavelengthsToTest.pop_back();
         }
 
@@ -162,7 +162,7 @@ int abundanceRunOnFile(std::string paramFile){
                     // If there's a line to give this thread, give it
                     if(k < threadLineLists[i].size()){
                         // Declare a line to synthesize, tell the program what observed spectrum we're comparing to
-                        newLine[i] = line(threadLineLists[i][k],std::stoi(currentAtmosphereModel.elementString[j]), currentAtmosphereModel.useMolecules, wholeSpec);
+                        newLine[i] = line( std::abs(threadLineLists[i][k]),std::stoi(currentAtmosphereModel.elementString[j]), currentAtmosphereModel.useMolecules || (threadLineLists[i][k] < 0) , wholeSpec);
                         newLine[i].lineInfo.maxAllowedChi2 = maxChi2;
                         newLine[i].lineInfo.maxAllowedVBroad = maxVBroad;
                         newLine[i].lineInfo.instBroadWidthPixels = nPixInstBroad;
@@ -213,7 +213,7 @@ int abundanceRunOnFile(std::string paramFile){
             std::cout << "[X/Fe] = " << medAbundance - currentAtmosphereModel.MonH << " +/- " << stdev << "\n"; 
             
             // Check if [Fe/H]_in == [Fe/H]_out. If not, exit 1         
-            if(currentAtmosphereModel.elementString[j] == "26"  && abs(currentAtmosphereModel.MonH - medAbundance) > std::max(stdev, 0.024)){
+            if(  (currentAtmosphereModel.elementString[j] == "26"  && abs(currentAtmosphereModel.MonH - medAbundance) > std::max(stdev, 0.024)) && !noIter  ){
                 std::cout << "[Fe/H] not converged yet\n";
                 std::cout << "Input was " << currentAtmosphereModel.MonH << "; Output was " << medAbundance << " +/- " << stdev << "\n";   
                 return 1;
@@ -229,7 +229,7 @@ int abundanceRunOnFile(std::string paramFile){
                 // If the alpha elements have been fit, check if [alpha/Fe]_in == [alpha/Fe]_out. If not, exit 1  
                 if(nAlphaElementsFit ==2){
                     stdevAlpha = pow(stdevAlpha,0.5);
-                    if(abs(currentAtmosphereModel.AonM - alpha) > std::max(stdevAlpha, 0.024) ){
+                    if( ( abs(currentAtmosphereModel.AonM - alpha) > std::max(stdevAlpha, 0.024) ) && !noIter ){
                         std::cout << "[alpha/Fe] not converged yet\n";
                         std::cout << "Input was " << currentAtmosphereModel.AonM << "; Output was " << alpha << " +/- " << stdevAlpha << "\n";                        
                         return 1;
@@ -250,7 +250,18 @@ int abundanceRunOnFile(std::string paramFile){
 
 int main(int argc, char* argv[]){
     std::string paramFile = argv[1];
-    
+    bool noIter = false;
+
+    if(argc > 2){
+        if (std::string(argv[2]) == "-ni"){
+            noIter = true;
+        }
+        else{
+            std::cout << "Invalid args\n";
+            return 1;
+        }
+    }
+
     // Create temp output folders for helper programs
     fs::create_directory("outlines");
     fs::create_directory("outsort");
@@ -258,7 +269,7 @@ int main(int argc, char* argv[]){
     fs::create_directory("MOOGout");
 
     // Run abundance analysis given a parameter file
-    int returnCode = abundanceRunOnFile(paramFile);
+    int returnCode = abundanceRunOnFile(paramFile, noIter);
 
     // Remove temp folders
     fs::remove_all("outlines");

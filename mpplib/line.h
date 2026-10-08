@@ -421,6 +421,7 @@ void line::calculateFitRegions(){
     std::string inLinemake;
     if(considerMolecules){
         inLinemake = "printf '" + std::to_string(waveLow) + "\n" + std::to_string(waveHigh) + "\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\n' | linemake/linemake " + lineMakeSuffix + " > linemakeconsoleout.txt";
+        // To ignore TiO, use this line instead inLinemake = "printf '" + std::to_string(waveLow) + "\n" + std::to_string(waveHigh) + "\ny\ny\ny\ny\ny\ny\ny\nn\ny\ny\ny\n' | linemake/linemake " + lineMakeSuffix + " > linemakeconsoleout.txt";
     }
     else{
         inLinemake = "printf '" + std::to_string(waveLow) + "\n" + std::to_string(waveHigh) + "\nn\ny\n' | linemake/linemake " + lineMakeSuffix + " > linemake/linemakeconsoleout.txt";
@@ -504,7 +505,7 @@ void line::renormalizeObs(){
     for(int i = 0; i < obsWaveGrid.size(); i++){
         point = obsWaveGrid.getRow(i);
 
-        if( (point[3] > 0.97 && point[3] < 1.03) && (point[1] > 0.95 && point[1] < 1.1) ) {
+        if( (point[3] > 0.97 && point[3] < 1.03) && (point[1] > 0.97 && point[1] < 1.1) ) {
             continuumPointsObs.push_back(point[1]);
             continuumPointsSyn.push_back(point[3]);
             continuumPointsErr.push_back(point[2]);
@@ -560,6 +561,7 @@ void line::setLineList(){
     std::string inLinemake;
     if(considerMolecules){
         inLinemake = "printf '" + std::to_string(waveLow) + "\n" + std::to_string(waveHigh) + "\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\n' | linemake/linemake " + lineMakeSuffix + " > linemakeconsoleout.txt";
+        // To ignore TiO, use this line instead inLinemake = "printf '" + std::to_string(waveLow) + "\n" + std::to_string(waveHigh) + "\ny\ny\ny\ny\ny\ny\ny\nn\ny\ny\ny\n' | linemake/linemake " + lineMakeSuffix + " > linemakeconsoleout.txt";
     }
     else{
         inLinemake = "printf '" + std::to_string(waveLow) + "\n" + std::to_string(waveHigh) + "\nn\ny\n' | linemake/linemake " + lineMakeSuffix + " > linemakeconsoleout.txt";

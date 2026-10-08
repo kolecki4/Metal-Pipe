@@ -23,8 +23,8 @@ plt.style.use("mpplib/MetalPipe.mplstyle")
 labelsize = 24
 
 
-maxLines = 9
-nRows = 3
+maxLines = 15
+nRows = int(np.ceil(maxLines /3))
 plotWidth = 4
 
 dataFolder = sys.argv[1]
@@ -76,9 +76,9 @@ for folder in folders:
 #        for i in range(len(files)):
 #            print(files[i], np.argsort(summary["chi2"])[i])
 
-        if len(files) > 9:
-            Best = files[np.argsort(summary["chi2"])][0:9]
-            BestAbs = summary["XH"][np.argsort(summary["chi2"])][0:9]
+        if len(files) > maxLines:
+            Best = files[np.argsort(summary["chi2"])][0:maxLines]
+            BestAbs = summary["XH"][np.argsort(summary["chi2"])][0:maxLines]
 
         else:
             Best = files
@@ -88,7 +88,7 @@ for folder in folders:
 
 
 
-        fig, ax = plt.subplots(nRows, 3, figsize = (plotWidth*nRows*2,plotWidth*nRows*1.5), layout = "constrained")
+        fig, ax = plt.subplots(nRows, 3, figsize = (plotWidth*nRows*2,plotWidth*nRows*2), layout = "constrained")
         fig.suptitle(folder, fontsize = 40)
         
         for i in range(len(Best)):

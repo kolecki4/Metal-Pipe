@@ -4,14 +4,19 @@ import os
 from mpplib.newIsoLib import *
 def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum = 0):
     
-   
+    vBroadInit = 4.5
+    elements = np.array([26,20,22,14,12,6,7,8,16,11,13,19,63])
+    #elements = np.array([26,20,22])
+
+
+
     bands = "U,B,V,R,I,J,H,K,L,M".split(",")    
     filterWaves = "3650,4450,5510,6580,8060,12200,16300,21900,34500,47500".split(',')
     filterWaves = [float(i) for i in filterWaves]
 
     targ = starName
-    elements = np.array([26,20,22,12,14,6,7,8,16,11,13,63])
-    #elements = np.array([26])
+    elements = np.array([26,20,22,12,14,6,7,8,16,11,13,19,63])
+    #elements = np.array([26,20,22])
 
     specFile = ""
     files = os.listdir(outputFolder)
@@ -25,7 +30,7 @@ def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum =
 
     MonHerror = 0
     AonMerror = 0
-    vBroadInit = 7.5
+
     lastMetallicity = 0
     lastAlpha = 0
 
@@ -205,8 +210,10 @@ def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum =
         print("", file = f)
         for i in range(len(elements)):
             print("%10s%10i%10.2f%10.2f" % ("SetAbund",elements[i],initOffsets[i]-(metal - lastMetallicity) - (alpha - lastAlpha)*(elements[i] % 2 == 0 and 7 < elements[i] < 23),initErrors[i]), file = f)
-        os.rename("aaa.png", outputFolder+"IsochronalParameters.png")
-
+        try:
+            os.rename("aaa.png", outputFolder+"IsochronalParameters.png")
+        except:
+            pass
 
 if __name__ == "__main__":
     try:
