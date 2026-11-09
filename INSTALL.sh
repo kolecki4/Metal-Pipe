@@ -5,205 +5,79 @@
 # IF YOU NEED TO SET G++ TO LINK TO GSL, DO SO HERE ###########################
 
 
-gppargs=""
-
-
-
+gslflags=""
+  
 # DO NOT CHANGE ANYTHING BELOW THIS POINT #####################################
 
+echo """
+    Welcome to the install script for Metal Pipe! 
+    To successfully install Metal Pipe on your system, 
+    a few things will need to be in place before we start.
 
+    Metal Pipe Prerequisites:
+    ╠── Compilers
+    ║   ╠── gfortran version >4.0
+    ║   ╠── g++ version >7.0
+    ║   ╚── XCode (MacOS only)
+    ╠── Python environment
+    ║   ╠── Python version >3.11
+    ║   ╚── Required python packages can be installed with: 
+    ║       'pip install pandas numpy matplotlib scipy astropy astroquery'
+    ╠── Additional libraries
+    ║   ╠── GSL (GNU Scientific Library)
+    ║   ║   ╠── On Ubuntu, try 'sudo apt install libgsl-dev'
+    ║   ║   ╚── On MacOS, try 'brew install gsl'
+    ║   ╠── GLIBC 
+    ║   ║   ╠── On Ubuntu, this should be installed already
+    ║   ║   ╚── On MacOS, try 'brew install glibc'
+    ║   ╚── coreutils (MacOS only)
+    ║       ╚── On MacOS, try 'brew install coreutils'
+    ╚── Final checks
+        ╠── You MUST disable your python environment before running  
+        ║   the install script (e.g. by running 'conda deactivate'). 
+        ║   You can safely 'conda activate' again once it's done.
+        ╚── You MUST verify that 'gslflags' (line 8 of INSTALL.sh)
+            points to the location of the gsl library on your system. 
+            If you installed gsl with apt, you can leave this blank.
+            If you installed gsl with brew on MacOS, change it to
+            '-I/opt/homebrew/include -L/opt/homebrew/lib'. Elsewise,
+            you'll have to figure this one out yourself.
+"""
 
+userConfirm=""
+while [[ !(${userConfirm,,} =~ ((^yes$)|(^y$)|(^no$)|(^n$))) ]];
+do
+    echo "I confirm that these prerequisites are met. Compile Metal Pipe (yes/no?): "
+    read userConfirm
 
-# Unique requirements for Linux
-
-autogppargs=""
-if [[ $OSTYPE == *"linux"* ]];
-then
-    # Check that GCC is installed
-    echo ""
-    gcc --version | grep "gcc"
-    if [ $? -ne 0 ];
+    if [[ ${userConfirm,,} =~ ((^yes$)|(^y$)) ]];
     then
-        echo "Check that you have gcc installed on your system"
-        echo "Try running the following command:"
-        echo ""
-        echo "sudo apt install gcc"
-        echo ""
-        echo "and then re-run the install script"
+        continue
+    elif [[ ${userConfirm,,} =~ ((^no$)|(^n$)) ]];
+    then
         exit 1
-    fi;
+    fi
 
-    # Check that GSL is installed
-    echo ""
-    echo "Package: libgsl-dev"
-    dpkg -s libgsl-dev | grep "installed"
-    if [ $? -ne 0 ];
-    then
-        echo "Searching for GSL..."
-        find / -iname gsl 2>&1 | grep -v "Permission denied\|Invalid argument\|anaconda\|downloads\|Downloads"
-        if [ $? -ne 0 ];
-        then
-            echo "Check that you have GSL installed on your system"
-            echo "Try running the following command:"
-            echo ""
-            echo "sudo apt install libgsl-dev"
-            echo ""
-            echo "and then re-run the install script"
-            exit 1
-        else
-            echo "GSL was found, but it was not installed using apt."
-            echo "Make sure you set the right g++ compiler flags to point it to where GSL is installed"
-        fi;
-    else
-        gppargs=" "
-    fi;
-    
-    echo "" 
-
-    
-
-
-
-
-
-# Unique requirements for Mac OS
-elif [[ $OSTYPE == *"darwin"* ]];
-then
-    # Check that coreutils is installed
-    echo ""
-    timeout 3 echo "coreutils installed"
-    if [ $? -ne 0 ];
-    then
-        echo "Check that you have coreutils installed on your system"
-        echo "Try running the following command:"
-        echo ""
-        echo "brew install coreutils"
-        echo ""
-        echo "and then re-run the install script"
-        exit 1
-    fi;  
-
-    # Check that gcc is installed
-    echo ""
-    gcc --version | grep "gcc"
-    if [ $? -eq 127 ];
-    then
-        echo "Check that you have gcc installed on your system"
-        echo "Try running the following command:"
-        echo ""
-        echo "brew install gcc"
-        echo ""
-        echo "and then re-run the install script"
-        exit 1
-    fi;
-
-    # Check that GSL is installed
-    echo ""
-    echo "Package: libgsl-dev"
-    brew list gsl | grep "No such keg"
-    if [ $? -eq 0 ];
-    then
-        echo "Searching for GSL..."
-        find / -iname gsl 2>&1 | grep -v "Permission denied\|Invalid argument\|anaconda\|downloads\|Downloads"
-        if [ $? -ne 0 ];
-        then
-            echo "Check that you have GSL installed on your system"
-            echo "Try running the following command:"
-            echo ""
-            echo "brew install gsl"
-            echo ""
-            echo "and then re-run the install script"
-            exit 1
-        else
-            echo "GSL was found, but it was not installed using apt."
-            echo "Make sure you set the right g++ compiler flags to point it to where GSL is installed"
-        fi;
-    else
-        autogppargs=" -I/opt/homebrew/include -L/opt/homebrew/lib"
-    fi;
-
-
-    # Check that there is no active conda environment (Apparently this breaks gfortran for some reason)
-    conda env list | grep "*" -q
-    if [ $? -eq 0 ];
-    then
-        echo "There is a conda environment active. This will mess up the installation process."
-        echo "Please run 'conda deactivate' before proceeding. You are free to reactivate your conda environment once the installation script has been run"
-        exit 1
-    fi;
-fi;
-
-if [[ $gppargs == "" ]];
-then
-    gppargs=$autogppargs
-fi;
+done;
 
 
 # Compile RunAbundanceOnGoodLines.cpp 
 echo "Compiling C++ code..."
 echo ""
-g++ RunAbundanceOnGoodLines.cpp -o RunAbundanceOnGoodLines -lgsl -lgslcblas -pthread -O2 -std=c++17 $gppargs
+g++ RunAbundanceOnGoodLines.cpp -o RunAbundanceOnGoodLines -lgsl -lgslcblas -pthread -O2 -std=c++17 $gslflags
 if [ $? -ne 0 ];
 then
-    g++ RunAbundanceOnGoodLines.cpp -o RunAbundanceOnGoodLines -lgsl -lgslcblas -pthread -O2 -std=c++2a $gppargs
+    g++ RunAbundanceOnGoodLines.cpp -o RunAbundanceOnGoodLines -lgsl -lgslcblas -pthread -O2 -std=c++2a $gslflags
     if [ $? -ne 0 ];
     then
         echo "Something went wrong when compiling the C++ code"
         echo ""
-        echo "Check that your version of gcc is recent enough to support the c++20 standard"
+        echo "Check that your version of gcc is recent enough to support the c++17 standard"
         echo ""
         echo "Also check that you have g++ installed and that you've pointed the compiler to the correct directory where libgsl is located, using the compiler flag -L[/path/to/libgsl]"
         exit 1
     fi;
 fi;
-
-
-
-
-
-# Try installing python packages if they aren't already
-pip show numpy | grep "Name\|Version"
-if [ $? -eq 1 ];
-then
-    echo ""
-    echo "Installing numpy..."
-    pip install numpy
-fi;
-echo ""
-echo "NumPy installed"
-
-
-pip show astropy | grep "Name\|Version"
-if [ $? -eq 1 ];
-then
-    echo ""
-    echo "Installing astropy..."
-    pip install astropy
-fi;
-echo ""
-echo "AstroPy installed"
-
-pip show scipy | grep "Name\|Version"
-if [ $? -eq 1 ];
-then
-    echo ""
-    echo "Installing scipy..."
-    pip install scipy
-fi;
-echo ""
-echo "SciPy installed"
-
-pip show astroquery | grep "Name\|Version"
-if [ $? -eq 1 ];
-then
-    echo ""
-    echo "Installing astroquery..."
-    pip install astroquery
-fi;
-echo ""
-echo "AstroQuery installed"
-
-
 
 
 
@@ -264,6 +138,21 @@ then
     rm PHOENIX.tar.gz
 fi;
 
+if [ ! -d "photometryCache" ];
+then
+    mkdir photometryCache
+fi;
+if [ ! -f "photometryCache/HD - SIMBADxGaia.csv" ];
+then
+    echo ""
+    echo "Downloading photometry cache for all HD stars"
+    curl "https://drive.usercontent.google.com/download?id=1Vg65ggTl1zNstwRclvHFIuCTao-l46fE&confirm=xxx" -o "photometryCache/HD - SIMBADxGaia.csv.tar.gz"
+    echo "Extracting photometry cache..."
+    tar -xf "photometryCache/HD - SIMBADxGaia.csv.tar.gz" -C photometryCache
+    rm "photometryCache/HD - SIMBADxGaia.csv.tar.gz"
+fi;
+
+
 
 
 
@@ -274,6 +163,6 @@ echo "DONE"
 echo ""
 echo "Try executing the following command:"
 echo ""
-echo "./runStar.sh \"tau Ceti\" example-tauCet/ -0.41"
+echo "./runStar.sh \"tau Cet\" example-tauCet/ -0.41 KPF"
 echo ""
 exit 0

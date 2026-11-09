@@ -1,7 +1,9 @@
 import sys
 import os
+import re
 
 import numpy as np
+import pandas as pd
 
 from astroquery.simbad import Simbad
 from astroquery.gaia import Gaia
@@ -40,6 +42,129 @@ class stellarParameters:
         self.metal = metal
         self.alpha = alpha
 
+
+def photFromCache(userInputStarName):
+    # Sanitize input
+
+    validCacheFiles = ["photometryCache/HD - SIMBADxGaia.csv"]
+    columnDtypes = {
+        "main_id":           object,
+        "hd_id":             object,
+        "hr_id":             object,
+        "kepler_id":         object,
+        "koi_id":            object,
+        "toi_id":            object,
+        "ra_simbad":     np.float64,
+        "dec_simbad":    np.float64,
+        "plx_simbad":    np.float64,
+        "plx_err_simbad":np.float64,
+        "plx_bibcode":       object,
+        "plx_gaia":      np.float64,
+        "plx_err_gaia":  np.float64,
+        "U":             np.float64,
+        "U_err":         np.float64,
+        "U_bib":             object,
+        "B":             np.float64,
+        "B_err":         np.float64,
+        "B_bib":             object,
+        "Bp":            np.float64,
+        "Bp_err":        np.float64,
+        "V":             np.float64,
+        "V_err":         np.float64,
+        "V_bib":             object,
+        "G":             np.float64,
+        "G_err":         np.float64,
+        "R":             np.float64,
+        "R_err":         np.float64,
+        "R_bib":             object,
+        "Rp":            np.float64,
+        "Rp_err":        np.float64,
+        "I":             np.float64,
+        "I_err":         np.float64,
+        "I_bib":             object,
+        "J":             np.float64,
+        "J_err":         np.float64,
+        "J_bib":             object,
+        "H":             np.float64,
+        "H_err":         np.float64,
+        "H_bib":             object,
+        "K":             np.float64,
+        "K_err":         np.float64,
+        "K_bib":             object,
+        "all_ids":           object
+    }
+
+    
+    starName = userInputStarName.upper().replace("_"," ")
+
+    # Split the input star name into strings of numbers (\d+) or (|) letters([a-zA-Z]+). 
+    # Allow for a trailing '-' on letter strings      
+    words = re.findall("\d+|[a-zA-Z,-]+", starName)
+
+    # Build a regex to find all elements of 'words' in a string, in order,
+    # with arbitrary whitespace between them
+    # Insist on either a string terminator or a '|' at the end, 
+    # because of how the 'all_id' column is formatted)
+    regexToMatch = ".*" + ("%s *"*len(words)) % tuple(words)  + "[|$]"
+
+    # For all cache files, read them and query them for the regex we've constructed
+    result = None
+    resultFound = False
+    for fName in validCacheFiles:
+        try:        
+            # Read it into a pandas DF            
+            cachedDataframe = pd.read_csv(fName, dtype = columnDtypes)
+            # Query the DF to find a row where 'regexToMatch' matches 'all_ids' 
+            queryResult = cachedDataframe.query("all_ids.str.match('%s', case=False)" % regexToMatch)
+            if len(queryResult) > 0:
+                result = queryResult.iloc[0]
+                resultFound = True
+                break
+        except FileNotFoundError:
+            print("Photometry cache file %s not found" % fName)
+    # If nothing is found, return nothing
+    if not resultFound:
+        return (), ()
+
+
+    # Run through all the bands and remove photometry from known problematic catalogs
+    badBibcodes = ["2012yCat.1322....0Z", "2005yCat.2263....0D", "2009yCat.1315....0Z"]
+    for band in ["U","B","V","R","I","J","H","K"]:
+        if result[band + "_bib"] in badBibcodes:
+            result[band] = np.nan
+            result[band + "err"] = np.nan
+
+
+    # Annoyingly reformat the result so it's compatible with the existing newIsoLib code              
+    columns = [('plx', float),('dist', float), ('U',float),('B',float),('Bp',float),('V',float),
+           ('R',float),('G',float),('Rp',float),('I',float),('J',float),('H',float),
+           ('K',float),
+           ('W1',float),('W2',float),('W3',float),('W4',float)]
+    
+    starmags = np.zeros(1, dtype = columns)
+    magerrs =  np.zeros(1, dtype = columns)
+    
+    if not np.isnan(result["plx_gaia"]):
+        d = 1000/result["plx_gaia"]
+        ed = d*result["plx_err_gaia"]/result["plx_gaia"]
+    elif not np.isnan(result["plx_simbad"]):
+        d = 1000/result["plx_simbad"]
+        ed = d*result["plx_err_simbad"]/result["plx_simbad"]
+    else:
+        raise RuntimeError("Somehow this star has no parallax from either Gaia or Simbad :/ weird.")
+
+    bands = np.array(['U', 'B', 'Bp', 'V', 'G', 'R', 'Rp', 'I', 'J', 'H', 'K'])
+    for band in bands:
+        starmags[band]=result[band] - 5*np.log10(d) + 5
+        magerrs[band]=(result[band+"_err"]**2 + (5*ed/((d)*np.log(10)))**2)**0.5
+    for band in bands:
+        if (not np.isnan(starmags[band])) and np.isnan(magerrs[band]):
+            magerrs[band] = 0.1
+
+    # Result is now backwards compatible!
+
+    return starmags, magerrs
+
 def queryPhotometry(star):
     """
     Uses astroquery to return an array containing 
@@ -59,6 +184,7 @@ def queryPhotometry(star):
 
     """
     customSimbad=Simbad()
+    customSimbad.server = "simbad.harvard.edu"
     customSimbad.add_votable_fields('parallax', 'plx_err')
     #customSimbad.add_votable_fields('flux_error(U)','flux_error(V)','flux_error(B)','flux_error(R)','flux_error(I)','flux_error(J)','flux_error(H)','flux_error(K)')
     customSimbad.add_votable_fields("flux")    
@@ -97,7 +223,7 @@ def queryPhotometry(star):
 
     if gaia2 is not None:
         gaiaid=gaia2
-        gaia2Vizier = Vizier(columns = ["Source", "Plx", "e_Plx", "Gmag", "e_Gmag", "BPmag", "e_BPmag", "RPmag", "e_RPmag"])
+        gaia2Vizier = Vizier(columns = ["Source", "Plx", "e_Plx", "Gmag", "e_Gmag", "BPmag", "e_BPmag", "RPmag", "e_RPmag"], vizier_server = "vizier.cfa.harvard.edu")
         gaia2Vizier.ROW_LIMIT = -1
         gai=gaia2Vizier.query_object(star, catalog = 'I/345/gaia2', radius = 180*u.arcsec, coordinate_frame = "J2016")
         print(gai)
@@ -129,7 +255,7 @@ def queryPhotometry(star):
     elif gaia3 is not None:
         gaiaid=sim['ID_GAIA_DR2'][0].replace('Gaia DR3 ', '')
         #print(gaiaid)
-        gaia3Vizier = Vizier(columns = ["Source", "Plx", "e_Plx", "Gmag", "e_Gmag", "BPmag", "e_BPmag", "RPmag", "e_RPmag"])
+        gaia3Vizier = Vizier(columns = ["Source", "Plx", "e_Plx", "Gmag", "e_Gmag", "BPmag", "e_BPmag", "RPmag", "e_RPmag"], vizier_server = "vizier.cfa.harvard.edu")
         gaia3Vizier.ROW_LIMIT = -1
         gai=gaia3Vizier.query_object(star, catalog = 'I/355/gaiadr3', radius = 120*u.arcsec, coordinate_frame = "J2016")[0]
         gai = gai[np.argwhere(gai["Source"] == int(gaiaid))[0][0]]
@@ -391,9 +517,13 @@ def MISTgetTandG(metal, ageRange, target = None, SIMBADphot = None):
     """
     
     if SIMBADphot == None and target != None: 
-        SIMBADphot=queryPhotometry(target)
-        starmags=SIMBADphot[0]
-        magerrs=SIMBADphot[1]
+        try:
+            starmags, magerrs = photFromCache(target)
+        except RuntimeError:
+            SIMBADphot=queryPhotometry(target)
+            starmags=SIMBADphot[0]
+            magerrs=SIMBADphot[1]
+
     elif SIMBADphot != None:
         starmags=SIMBADphot[0]
         magerrs=SIMBADphot[1]
@@ -427,7 +557,7 @@ def MISTgetTandG(metal, ageRange, target = None, SIMBADphot = None):
     
     goodPoints = np.zeros_like(waves)
     for i in bands:
-        if starmags[i] != 0:
+        if starmags[i] != 0 and not np.isnan(starmags[i]):
             print("%2s: %.2f %.2f" %(i, starmags[i], magerrs[i]))
             goodPoints[np.argwhere(bands == i)[0][0]] = 1
 

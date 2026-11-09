@@ -1,4 +1,6 @@
 import numpy as np
+import traceback
+
 import sys
 import os
 from mpplib.newIsoLib import *
@@ -138,7 +140,11 @@ def setParams(starName, outputFolder, outputFile, metal = 0, alpha = 0, runNum =
    
 
     else:
-        phot = queryPhotometry(targ)
+        phot = photFromCache(targ)
+        if len(phot[0]) == 0:
+            print("%s not found in cached files. Querying SIMBAD and Vizier remotely" % targ)
+            phot=queryPhotometry(targ)
+
         if metal in np.round(np.arange(-1.5,0.51,0.1),2):
             params =  MISTgetTandG(metal,"2", target = targ, SIMBADphot=phot)
             params.alpha = alpha 
@@ -224,5 +230,6 @@ if __name__ == "__main__":
         else:
             print("Usage: computeParamFile.py [Star Name] [Star Directory] [Output Param File] (Metallicity = 0) (alpha = 0) (runNum = 0)")
     except Exception as e:
-        print(e)        
+        print(e)  
+        print(traceback.format_exc())      
         sys.exit(1)

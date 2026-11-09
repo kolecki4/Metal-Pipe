@@ -29,7 +29,6 @@ def correctAbundances(workDir, inst):
             lblCorrectionsSubset.to_csv(workDir+element+"/abundanceSummaryCorrected.csv", index = False, columns = ["Wavelength", "X_H", "v_broad", "chi2"])
             for i in range(len(paramFileLines)):
                 if "%10s%10i" % ("SetAbund",int(element) ) in paramFileLines[i]:
-                    print("ksfjldgjklgsdjlksf")
                     paramFileLines[i] = "%10s%10i%10.2f%10.2f\n" % ("SetAbund",int(element) ,np.nanmean(lblCorrectionsSubset["X_H"]),np.nanstd(lblCorrectionsSubset["X_H"])/len(lblCorrectionsSubset["X_H"])**0.5  )
                     break
 
@@ -37,7 +36,6 @@ def correctAbundances(workDir, inst):
             print("Skipping Element %s (no abundanceSummary.txt found)" % element)    
             for i in range(len(paramFileLines)):
                 if "%10s%10i" % ("SetAbund",int(element) ) in paramFileLines[i]:
-                    print("ksfjldgjklgsdjlksf")
                     paramFileLines[i] = "%10s%10i%10.2f%10.2f\n" % ("SetAbund",int(element) ,np.nan,np.nan)
                     break
 
