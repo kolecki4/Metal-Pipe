@@ -6,6 +6,7 @@ outtemp/
 PHOENIX/
 MOOGout/
 NewEra/
+photometryCache/
 test_files/
 .vscode/
 __pycache__
@@ -19,6 +20,8 @@ example-tauCet/
 linemakeconsoleout.txt
 linemake/linemakeconsoleout.txt
 mpplib/modelatmosphere.txt
+mpplib/SIMBAD TAP Queries/
+mpplib/queryStar.py
 moog/*.o
 moogToCPP/
 Barklem.dat
@@ -26,3 +29,5 @@ BarklemUV.dat
 fort.20
 fort.21
 *.bak
+FailedLog
+
